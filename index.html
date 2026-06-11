@@ -1918,10 +1918,10 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
   const autoMode = (settings?.scheduleMode ?? "auto") === "auto";
   const chunkBoundary = settings?.chunkBoundary ?? true;
   // 科目 (stored as `category`): persisted list, plus any from existing subjects
-  const allCategories = [...new Set([...(subjectCategories || ["CPA勉強"]), ...subjects.map(s => s.category || "CPA勉強")])];
-  if (allCategories.length === 0) allCategories.push("CPA勉強");
+  const allCategories = [...new Set([...(subjectCategories || ["数学"]), ...subjects.map(s => s.category || "数学")])];
+  if (allCategories.length === 0) allCategories.push("数学");
   const [activeCategory, setActiveCategory] = useState(allCategories[0]);
-  const categorySubjects = subjects.filter(s => (s.category || "CPA勉強") === activeCategory);
+  const categorySubjects = subjects.filter(s => (s.category || "数学") === activeCategory);
   // 教材 (stored as `subjects`) shown in the tab row for the active 科目
   const visibleSubjects = categorySubjects;
   const [activeSubject, setActiveSubject] = useState(categorySubjects[0]?.id || null);
@@ -1961,7 +1961,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
 
   // When 科目 changes: pick a sensible active 教材
   useEffect(() => {
-    const subsInCat = subjects.filter(s => (s.category || "CPA勉強") === activeCategory);
+    const subsInCat = subjects.filter(s => (s.category || "数学") === activeCategory);
     if (!subsInCat.some(s => s.id === activeSubject)) {
       setActiveSubject(subsInCat[0]?.id || null);
     }
@@ -2485,7 +2485,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
       <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
         {allCategories.map(cat => {
           const isActive = activeCategory === cat;
-          const subsInCat = subjects.filter(s => (s.category || "CPA勉強") === cat).length;
+          const subsInCat = subjects.filter(s => (s.category || "数学") === cat).length;
           return (
             <div key={cat} style={{ display: "flex", flexShrink: 0 }}>
               <button onClick={() => setActiveCategory(cat)}
@@ -2598,7 +2598,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                   <div style={{ fontSize: 11, color: C.textMid, marginTop: 8, marginBottom: 4 }}>科目</div>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                     {allCategories.map(cat => {
-                      const cur = activeSubjectData.category || "CPA勉強";
+                      const cur = activeSubjectData.category || "数学";
                       return (
                         <button key={cat} onClick={() => {
                           setSubjects(ss => ss.map(s => s.id === editSubjectId
@@ -5134,7 +5134,7 @@ function App() {
   const [tasks, setTasks] = usePersistedState("tasks", []);
   const [goals, setGoals] = usePersistedState("goals", SAMPLE_GOALS);
   const [subjects, setSubjects] = usePersistedState("subjects", SAMPLE_SUBJECTS);
-  const [subjectCategories, setSubjectCategories] = usePersistedState("subjectCategories", ["CPA勉強"]);
+  const [subjectCategories, setSubjectCategories] = usePersistedState("subjectCategories", ["数学"]);
   const [subjectTodos, setSubjectTodos] = usePersistedState("subjectTodos", SAMPLE_SUBJECT_TODOS);
   const [monthlyPlans, setMonthlyPlans] = usePersistedState("monthlyPlans", []);
   const [weeklyPlans, setWeeklyPlans] = usePersistedState("weeklyPlans", []);
