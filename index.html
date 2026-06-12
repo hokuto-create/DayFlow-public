@@ -139,6 +139,11 @@ function srSet(level, base) {
   if (!level) return { understanding: null, reviewDue: null };
   return { understanding: level, reviewDue: level >= 4 ? null : addDays(base, SR_INTERVAL[level]) };
 }
+// 間隔反復の2択ボタンの文言。単語帳・一問一答系（kind: "vocab"）の教材は
+// 「覚えた/あやふや」、演習書は「解けた/解けなかった」。
+const srChoice = (subj) => (subj && subj.kind === "vocab")
+  ? { ok: "覚えた", ng: "あやふや",     ngShort: "あやふや" }
+  : { ok: "解けた", ng: "解けなかった", ngShort: "解けない" };
 
 /* ── AUTO-DISTRIBUTE HELPERS ──
    Used by the subject auto-distribution (自動分配) feature. */
@@ -949,9 +954,10 @@ function DayView({ tasks, setTasks, selectedDate, setSelectedDate, goals, subjec
         const curInfo = SR_MARK[cur];
         const okNext = SR_MARK[srApply(cur, true, todayStr()).understanding];
         const ngNext = SR_MARK[srApply(cur, false, todayStr()).understanding];
+        const SC = srChoice(subjData);
         const CHOICES = [
-          { solved: true,  title: "解けた",       sub: `→ ${okNext.mark}（${okNext.label}）`, color: C.green },
-          { solved: false, title: "解けなかった", sub: `→ ${ngNext.mark}（${ngNext.label}）`, color: C.red },
+          { solved: true,  title: SC.ok, sub: `→ ${okNext.mark}（${okNext.label}）`, color: C.green },
+          { solved: false, title: SC.ng, sub: `→ ${ngNext.mark}（${ngNext.label}）`, color: C.red },
         ];
         return (
           <div style={{
@@ -1940,8 +1946,54 @@ async function loadTemplateData(id) {
   _tplDataCache[id] = json;
   return json;
 }
-const templateItemCount = (data) =>
-  (data.chapters || []).reduce((s, ch) => s + ((ch.items || []).length), 0);
+// 単語帳・一問一答系テンプレ（type: "vocab"）の区切り生成。
+// mode は "sections"（章・節の区切り）か数値（番号N個ずつ）。
+// 数値モードは章の range 内で区切る（章をまたがない）。range の無い章
+// （多義語など）は sections / items にフォールバックする。
+function buildVocabChunks(data, mode) {
+  const unit = data.unitLabel || "No.";
+  const per100 = data.minutesPer100 || 30;
+  const minutesFor = (n) => Math.max(5, Math.round(n * per100 / 100));
+  const chunks = []; // { chapterTitle, text, minutes }
+  (data.chapters || []).forEach(ch => {
+    const chapterTitle = (ch.title || "").trim();
+    if (typeof mode === "number" && ch.range) {
+      for (let a = ch.range.from; a <= ch.range.to; a += mode) {
+        const b = Math.min(a + mode - 1, ch.range.to);
+        chunks.push({ chapterTitle, text: `${unit}${a}〜${b}`, minutes: minutesFor(b - a + 1) });
+      }
+    } else if (ch.sections && ch.sections.length) {
+      ch.sections.forEach(s => chunks.push({
+        chapterTitle,
+        text: `${s.title}（${unit}${s.from}〜${s.to}）`,
+        minutes: minutesFor(s.to - s.from + 1),
+      }));
+    } else if (ch.range) {
+      chunks.push({ chapterTitle, text: `${unit}${ch.range.from}〜${ch.range.to}`, minutes: minutesFor(ch.range.to - ch.range.from + 1) });
+    } else {
+      (ch.items || []).forEach(item => {
+        if (item && item.text) chunks.push({ chapterTitle, text: item.text, minutes: item.minutes });
+      });
+    }
+  });
+  return chunks;
+}
+// テンプレを問題リスト（{ chapterTitle, text, minutes } の配列）に展開する。
+// vocabMode は type: "vocab" のときのみ使用。
+function templateEntries(data, vocabMode) {
+  if (data.type === "vocab") return buildVocabChunks(data, vocabMode || "sections");
+  const out = [];
+  (data.chapters || []).forEach(ch => {
+    const chapterTitle = (ch.title || "").trim();
+    (ch.items || []).forEach(item => {
+      if (item && item.text) out.push({ chapterTitle, text: item.text, minutes: item.minutes });
+    });
+  });
+  return out;
+}
+// vocab テンプレの総語数（range を持つ章の合計）
+const vocabTotalWords = (data) =>
+  (data.chapters || []).reduce((s, ch) => s + (ch.range ? ch.range.to - ch.range.from + 1 : 0), 0);
 
 function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, monthlyPlans, setMonthlyPlans, weeklyPlans, setWeeklyPlans, tasks, setTasks, selectedDate, goals, subjectCategories, setSubjectCategories, settings }) {
   const autoMode = (settings?.scheduleMode ?? "auto") === "auto";
@@ -1992,6 +2044,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
   const [tplFilterSubject, setTplFilterSubject] = useState("all");
   const [tplLoadingId, setTplLoadingId] = useState(null);
   const [tplPreview, setTplPreview] = useState(null); // 取り込み前の確認画面に表示する教材データ
+  const [tplVocabMode, setTplVocabMode] = useState("sections"); // vocab型の区切り: "sections" | 25 | 50 | 100
 
   useEffect(() => {
     let alive = true;
@@ -2035,6 +2088,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
     setTplSearch("");
     setTplFilterSubject("all");
     setTplLoadingId(null);
+    setTplVocabMode("sections");
   };
 
   const openTplPreview = async (entry) => {
@@ -2042,6 +2096,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
     setTplLoadingId(entry.id);
     try {
       const data = await loadTemplateData(entry.id);
+      setTplVocabMode("sections");
       setTplPreview(data);
     } catch (e) {
       alert("テンプレートの読み込みに失敗しました。通信環境を確認してください。");
@@ -2060,22 +2115,17 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
       setSubjectCategories(cs => [...(cs || []), cat]);
     }
     const id = genId();
-    setSubjects(ss => [...ss, { id, name: data.name, color: data.color || C.blue, category: cat, templateId: data.id }]);
+    setSubjects(ss => [...ss, {
+      id, name: data.name, color: data.color || C.blue, category: cat, templateId: data.id,
+      ...(data.type === "vocab" ? { kind: "vocab" } : {}),
+    }]);
     const now = Date.now();
-    let i = 0;
-    const newTodos = [];
-    (data.chapters || []).forEach(ch => {
-      const titlePrefix = (ch.title || "").trim() ? `${ch.title.trim()} ` : "";
-      (ch.items || []).forEach(item => {
-        if (!item || !item.text) return;
-        newTodos.push({
-          id: genId(), subjectId: id,
-          text: titlePrefix + item.text,
-          minutes: (typeof item.minutes === "number" && item.minutes > 0) ? item.minutes : null,
-          status: "unwatched", done: false, createdAt: now + (i++),
-        });
-      });
-    });
+    const newTodos = templateEntries(data, tplVocabMode).map((en, i) => ({
+      id: genId(), subjectId: id,
+      text: (en.chapterTitle ? `${en.chapterTitle} ` : "") + en.text,
+      minutes: (typeof en.minutes === "number" && en.minutes > 0) ? en.minutes : null,
+      status: "unwatched", done: false, createdAt: now + i,
+    }));
     if (newTodos.length) setSubjectTodos(ts => [...ts, ...newTodos]);
     setActiveCategory(cat);
     setActiveSubject(id);
@@ -2692,7 +2742,8 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
           (!q || `${t.name} ${t.publisher || ""} ${t.subject || ""}`.toLowerCase().includes(q))
         );
         const pv = tplPreview;
-        const pvCount = pv ? templateItemCount(pv) : 0;
+        const pvIsVocab = pv && pv.type === "vocab";
+        const pvCount = pv ? templateEntries(pv, tplVocabMode).length : 0;
         return (
           <div style={{
             position: "fixed", inset: 0, background: "#0008", zIndex: 100,
@@ -2742,7 +2793,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                               background: C.purpleDim, color: C.purple, fontWeight: 600,
                             }}>{t.subject}</span>
                             <span>{t.publisher}{t.edition ? `・${t.edition}` : ""}</span>
-                            <span>{t.itemCount}問</span>
+                            <span>{t.type === "vocab" ? `全${t.total}語` : `${t.itemCount}問`}</span>
                             {t.verified === false && <span style={{ color: C.yellow }}>⚠ 要確認</span>}
                             {imported && <span style={{ color: C.green }}>✓ 取り込み済み</span>}
                           </div>
@@ -2763,12 +2814,29 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                     <div style={{ fontSize: 12, color: C.textMid, marginTop: 4 }}>
                       {pv.publisher}{pv.edition ? `・${pv.edition}` : ""}
                     </div>
-                    <div style={{ fontSize: 12, color: C.textMid, marginTop: 6, display: "flex", gap: 12 }}>
+                    <div style={{ fontSize: 12, color: C.textMid, marginTop: 6, display: "flex", gap: 12, flexWrap: "wrap" }}>
                       <span>科目: <b style={{ color: C.text }}>{pv.subject}</b></span>
                       <span>{(pv.chapters || []).length}章</span>
-                      <span><b style={{ color: pv.color || C.blue }}>{pvCount}</b>問</span>
+                      {pvIsVocab && <span>全{vocabTotalWords(pv)}語</span>}
+                      <span><b style={{ color: pv.color || C.blue }}>{pvCount}</b>{pvIsVocab ? "区分" : "問"}</span>
                     </div>
                   </div>
+                  {pvIsVocab && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, color: C.textMid, marginBottom: 4 }}>区切り方（1つのTODOにまとめる範囲）</div>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                        {[["sections", "章・節ごと"], ...(pv.chunkSizes || [25, 50, 100]).map(n => [n, `${n}個ずつ`])].map(([k, label]) => (
+                          <button key={k} onClick={() => setTplVocabMode(k)}
+                            style={{ ...btn(tplVocabMode === k, pv.color || C.blue, { fontSize: 11, padding: "5px 10px", whiteSpace: "nowrap" }) }}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ fontSize: 10, color: C.textDim, marginTop: 4 }}>
+                        番号区切りは章をまたがず、章ごとに区切り直します
+                      </div>
+                    </div>
+                  )}
                   <div style={{
                     padding: "10px 12px", borderRadius: 8, marginBottom: 10,
                     background: C.yellowDim, border: `1px solid ${C.yellow}40`,
@@ -2789,7 +2857,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => importTemplate(pv)}
                       style={{ ...btn(true, pv.color || C.blue, { flex: 1, padding: "9px", fontSize: 13 }) }}>
-                      取り込む（{pvCount}問）
+                      取り込む（{pvCount}{pvIsVocab ? "件" : "問"}）
                     </button>
                     <button onClick={() => setTplPreview(null)}
                       style={{ ...btn(false, C.textMid, { padding: "9px 14px", fontSize: 12 }) }}>戻る</button>
@@ -3246,11 +3314,11 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                         <button onClick={() => recordResult(item.id, true)}
                           style={{ padding: "4px 10px", borderRadius: 6, background: C.green,
                             border: `1px solid ${C.green}`, color: "#fff", fontSize: 11, fontWeight: 700,
-                            cursor: "pointer", lineHeight: 1, fontFamily: font, flexShrink: 0 }}>解けた</button>
+                            cursor: "pointer", lineHeight: 1, fontFamily: font, flexShrink: 0 }}>{srChoice(subj).ok}</button>
                         <button onClick={() => recordResult(item.id, false)}
                           style={{ padding: "4px 10px", borderRadius: 6, background: "transparent",
                             border: `1px solid ${C.red}`, color: C.red, fontSize: 11, fontWeight: 700,
-                            cursor: "pointer", lineHeight: 1, fontFamily: font, flexShrink: 0 }}>解けない</button>
+                            cursor: "pointer", lineHeight: 1, fontFamily: font, flexShrink: 0 }}>{srChoice(subj).ngShort}</button>
                       </div>
                     );
                   })}
@@ -3636,14 +3704,14 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                                 background: C.green, border: `1px solid ${C.green}`,
                                 color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
                                 lineHeight: 1, fontFamily: font,
-                              }}>解けた</button>
+                              }}>{srChoice(activeSubjectData).ok}</button>
                             <button onClick={() => recordResult(c.id, false)}
                               style={{
                                 padding: "4px 12px", borderRadius: 6,
                                 background: "transparent", border: `1px solid ${C.red}`,
                                 color: C.red, fontSize: 12, fontWeight: 700, cursor: "pointer",
                                 lineHeight: 1, fontFamily: font,
-                              }}>解けなかった</button>
+                              }}>{srChoice(activeSubjectData).ng}</button>
                             {c.understanding && (
                               <button onClick={() => setUnderstanding(c.id, null)} title="マークを消す"
                                 style={{

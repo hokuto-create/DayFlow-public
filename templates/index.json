@@ -3,48 +3,55 @@
   "templates": [
     {
       "id": "chart-blue-1a",
+      "type": "problems",
       "name": "青チャート 数学I+A（増補改訂版）",
       "subject": "数学",
       "publisher": "数研出版",
       "edition": "増補改訂版",
-      "itemCount": 233,
-      "verified": false
+      "verified": false,
+      "itemCount": 233
     },
     {
       "id": "target-1900",
+      "type": "vocab",
       "name": "英単語ターゲット1900（6訂版）",
       "subject": "英語",
       "publisher": "旺文社",
       "edition": "6訂版",
+      "verified": false,
       "itemCount": 19,
-      "verified": false
+      "total": 1900
     },
     {
       "id": "systan-5",
+      "type": "vocab",
       "name": "システム英単語（5訂版）",
       "subject": "英語",
       "publisher": "駿台文庫",
       "edition": "5訂版",
-      "itemCount": 21,
-      "verified": false
+      "verified": false,
+      "itemCount": 5,
+      "total": 2000
     },
     {
       "id": "physics-essence-mechanics",
+      "type": "problems",
       "name": "物理のエッセンス 力学・波動（四訂版）力学編",
       "subject": "物理",
       "publisher": "河合出版",
       "edition": "四訂版",
-      "itemCount": 104,
-      "verified": false
+      "verified": false,
+      "itemCount": 104
     },
     {
       "id": "kisomon-seiko-1a",
+      "type": "problems",
       "name": "数学I・A 基礎問題精講（五訂版）",
       "subject": "数学",
       "publisher": "旺文社",
       "edition": "五訂版",
-      "itemCount": 125,
-      "verified": false
+      "verified": false,
+      "itemCount": 125
     }
   ]
 }

@@ -19,22 +19,25 @@
   "templates": [
     {
       "id": "chart-blue-1a",          // 本体ファイル名（<id>.json）と一致させる
+      "type": "problems",              // "problems"（演習書）| "vocab"（単語帳・一問一答）
       "name": "青チャート 数学I+A（増補改訂版）",
       "subject": "数学",               // アプリの「科目」名。無ければ取り込み時に自動作成される
       "publisher": "数研出版",
       "edition": "増補改訂版",
-      "itemCount": 233,                // 本体の全 items 数と一致させる
+      "itemCount": 233,                // problems: 全 items 数 / vocab: 章・節モードでの区分数
+      "total": 1900,                   // vocab のみ: 総語数（一覧に「全1900語」と表示される）
       "verified": false                // 実書と照合済みなら true
     }
   ]
 }
 ```
 
-### 教材本体（`<id>.json`）
+### 教材本体（`<id>.json`）— type: "problems"（演習書）
 
 ```json
 {
   "id": "chart-blue-1a",
+  "type": "problems",
   "name": "青チャート 数学I+A（増補改訂版）",
   "subject": "数学",
   "publisher": "数研出版",
@@ -54,8 +57,52 @@
 }
 ```
 
+### 教材本体（`<id>.json`）— type: "vocab"（単語帳・一問一答）
+
+vocab 型は items を直接持たず、章ごとの**番号レンジ**（`range`）と書籍本来の
+**節区切り**（`sections`）を持つ。取り込み時にユーザーが区切り方を選び、
+アプリ側で items に展開される:
+
+- **章・節ごと**: `sections` を1件ずつTODOに（`sections` が無い章は `range` 丸ごと1件）
+- **N個ずつ**（`chunkSizes` から選択。既定 25/50/100）: `range` をN個刻みで分割。
+  章はまたがない。`range` の無い章（多義語など）は `sections`/`items` にフォールバック
+
+```json
+{
+  "id": "target-1900",
+  "type": "vocab",
+  "name": "英単語ターゲット1900（6訂版）",
+  "subject": "英語",
+  "publisher": "旺文社",
+  "edition": "6訂版",
+  "color": "#3A9D6E",
+  "unitLabel": "No.",                  // 番号の接頭辞（"No." / "問" など）
+  "minutesPer100": 30,                 // 100個あたりの想定学習時間（分）。区分の長さに応じて換算
+  "chunkSizes": [25, 50, 100],         // 選択肢として出す区切りサイズ
+  "verified": false,
+  "reviewNote": "要確認: ...",
+  "chapters": [
+    {
+      "title": "Part 1 常に試験に出る基本単語800語",
+      "note": "要確認: ...",
+      "range": { "from": 1, "to": 800 },
+      "sections": [
+        { "title": "Section 1", "from": 1, "to": 100 }
+      ]
+    },
+    {
+      "title": "Stage 5 多義語",        // 番号レンジを持たない章は items で直接指定
+      "items": [ { "text": "多義語（全範囲）", "minutes": 60 } ]
+    }
+  ]
+}
+```
+
+vocab 型で取り込んだ教材には `kind: "vocab"` が付き、間隔反復の2択ボタンが
+「解けた/解けなかった」ではなく**「覚えた/あやふや」**と表示される。
+
 取り込み時の動作: `subject` が科目一覧に無ければ追加 → 教材（subjects）を1件作成 →
-`chapters[].items` を問題（subjectTodos）に展開（text は「章タイトル + 半角スペース + item.text」）。
+展開した items を問題（subjectTodos）に登録（text は「章タイトル + 半角スペース + item.text」）。
 
 ## 問題の区分方針（単語帳・一問一答など）
 
