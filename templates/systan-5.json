@@ -1,123 +1,59 @@
 {
   "id": "systan-5",
+  "type": "vocab",
   "name": "システム英単語（5訂版）",
   "subject": "英語",
   "publisher": "駿台文庫",
   "edition": "5訂版",
   "color": "#8B6FCC",
+  "unitLabel": "No.",
+  "minutesPer100": 30,
+  "chunkSizes": [
+    25,
+    50,
+    100
+  ],
   "verified": false,
-  "reviewNote": "要確認: 各Stageの単語番号範囲はプレースホルダ。5訂版の実書でStage区切り・収録語数を確認して修正すること",
+  "reviewNote": "要確認: 各Stageの単語番号範囲はプレースホルダ。5訂版の実書でStage区切り・収録語数を確認して修正すること。Stage内の節構成が確認できたら sections を追加する",
   "chapters": [
     {
       "title": "Stage 1 Fundamental Stage",
       "note": "要確認: 番号範囲",
-      "items": [
-        {
-          "text": "No.1〜100",
-          "minutes": 30
-        },
-        {
-          "text": "No.101〜200",
-          "minutes": 30
-        },
-        {
-          "text": "No.201〜300",
-          "minutes": 30
-        },
-        {
-          "text": "No.301〜400",
-          "minutes": 30
-        },
-        {
-          "text": "No.401〜500",
-          "minutes": 30
-        },
-        {
-          "text": "No.501〜600",
-          "minutes": 30
-        }
-      ]
+      "range": {
+        "from": 1,
+        "to": 600
+      }
     },
     {
       "title": "Stage 2 Essential Stage",
       "note": "要確認: 番号範囲",
-      "items": [
-        {
-          "text": "No.601〜700",
-          "minutes": 30
-        },
-        {
-          "text": "No.701〜800",
-          "minutes": 30
-        },
-        {
-          "text": "No.801〜900",
-          "minutes": 30
-        },
-        {
-          "text": "No.901〜1000",
-          "minutes": 30
-        },
-        {
-          "text": "No.1001〜1100",
-          "minutes": 30
-        },
-        {
-          "text": "No.1101〜1200",
-          "minutes": 30
-        }
-      ]
+      "range": {
+        "from": 601,
+        "to": 1200
+      }
     },
     {
       "title": "Stage 3 Advanced Stage",
       "note": "要確認: 番号範囲",
-      "items": [
-        {
-          "text": "No.1201〜1300",
-          "minutes": 30
-        },
-        {
-          "text": "No.1301〜1400",
-          "minutes": 30
-        },
-        {
-          "text": "No.1401〜1500",
-          "minutes": 30
-        },
-        {
-          "text": "No.1501〜1600",
-          "minutes": 30
-        },
-        {
-          "text": "No.1601〜1700",
-          "minutes": 30
-        }
-      ]
+      "range": {
+        "from": 1201,
+        "to": 1700
+      }
     },
     {
       "title": "Stage 4 Final Stage",
       "note": "要確認: 番号範囲",
-      "items": [
-        {
-          "text": "No.1701〜1800",
-          "minutes": 30
-        },
-        {
-          "text": "No.1801〜1900",
-          "minutes": 30
-        },
-        {
-          "text": "No.1901〜2000",
-          "minutes": 30
-        }
-      ]
+      "range": {
+        "from": 1701,
+        "to": 2000
+      }
     },
     {
       "title": "Stage 5 多義語",
       "note": "要確認: 収録範囲・語数",
       "items": [
         {
-          "text": "多義語（全範囲）",
+          "text": "全範囲",
           "minutes": 60
         }
       ]
