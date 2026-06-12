@@ -1,0 +1,560 @@
+{
+  "id": "kisomon-seiko-1a",
+  "name": "数学I・A 基礎問題精講（五訂版）",
+  "subject": "数学",
+  "publisher": "旺文社",
+  "edition": "五訂版",
+  "color": "#D4A528",
+  "verified": false,
+  "reviewNote": "要確認: 版（五訂版か最新版か）・章構成・基礎問の数はプレースホルダ。実書と照合して修正すること",
+  "chapters": [
+    {
+      "title": "第1章 数と式",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問1",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問2",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問3",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問4",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問5",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問6",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問7",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問8",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問9",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問10",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問11",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問12",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問13",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問14",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第2章 集合と論理",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問15",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問16",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問17",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問18",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問19",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問20",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問21",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問22",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第3章 2次関数",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問23",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問24",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問25",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問26",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問27",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問28",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問29",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問30",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問31",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問32",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問33",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問34",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問35",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問36",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問37",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問38",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問39",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問40",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問41",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問42",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問43",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問44",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第4章 図形と計量",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問45",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問46",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問47",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問48",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問49",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問50",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問51",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問52",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問53",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問54",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問55",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問56",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問57",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問58",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問59",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問60",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問61",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問62",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第5章 データの分析",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問63",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問64",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問65",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問66",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問67",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問68",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問69",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問70",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問71",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問72",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第6章 場合の数・確率",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問73",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問74",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問75",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問76",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問77",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問78",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問79",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問80",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問81",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問82",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問83",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問84",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問85",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問86",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問87",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問88",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問89",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問90",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問91",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問92",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問93",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問94",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問95",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問96",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第7章 整数の性質",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問97",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問98",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問99",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問100",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問101",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問102",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問103",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問104",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問105",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問106",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問107",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問108",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問109",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問110",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第8章 図形の性質",
+      "note": "要確認: 章タイトル・基礎問数・通し番号はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "基礎問111",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問112",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問113",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問114",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問115",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問116",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問117",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問118",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問119",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問120",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問121",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問122",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問123",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問124",
+          "minutes": 15
+        },
+        {
+          "text": "基礎問125",
+          "minutes": 15
+        }
+      ]
+    }
+  ]
+}

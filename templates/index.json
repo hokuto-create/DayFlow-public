@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "chart-blue-1a",
+      "name": "青チャート 数学I+A（増補改訂版）",
+      "subject": "数学",
+      "publisher": "数研出版",
+      "edition": "増補改訂版",
+      "itemCount": 233,
+      "verified": false
+    },
+    {
+      "id": "target-1900",
+      "name": "英単語ターゲット1900（6訂版）",
+      "subject": "英語",
+      "publisher": "旺文社",
+      "edition": "6訂版",
+      "itemCount": 19,
+      "verified": false
+    },
+    {
+      "id": "systan-5",
+      "name": "システム英単語（5訂版）",
+      "subject": "英語",
+      "publisher": "駿台文庫",
+      "edition": "5訂版",
+      "itemCount": 21,
+      "verified": false
+    },
+    {
+      "id": "physics-essence-mechanics",
+      "name": "物理のエッセンス 力学・波動（四訂版）力学編",
+      "subject": "物理",
+      "publisher": "河合出版",
+      "edition": "四訂版",
+      "itemCount": 104,
+      "verified": false
+    },
+    {
+      "id": "kisomon-seiko-1a",
+      "name": "数学I・A 基礎問題精講（五訂版）",
+      "subject": "数学",
+      "publisher": "旺文社",
+      "edition": "五訂版",
+      "itemCount": 125,
+      "verified": false
+    }
+  ]
+}
