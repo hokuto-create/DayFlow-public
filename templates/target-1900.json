@@ -1,0 +1,106 @@
+{
+  "id": "target-1900",
+  "name": "英単語ターゲット1900（6訂版）",
+  "subject": "英語",
+  "publisher": "旺文社",
+  "edition": "6訂版",
+  "color": "#3A9D6E",
+  "verified": false,
+  "reviewNote": "要確認: Part名・Section区切り（100語×19 Section）は6訂版を想定。実書と照合して確定すること",
+  "chapters": [
+    {
+      "title": "Part 1 常に試験に出る基本単語800語",
+      "note": "要確認: Part名・Section範囲",
+      "items": [
+        {
+          "text": "Section 1（No.1〜100）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 2（No.101〜200）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 3（No.201〜300）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 4（No.301〜400）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 5（No.401〜500）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 6（No.501〜600）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 7（No.601〜700）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 8（No.701〜800）",
+          "minutes": 30
+        }
+      ]
+    },
+    {
+      "title": "Part 2 常に試験に出る重要単語700語",
+      "note": "要確認: Part名・Section範囲",
+      "items": [
+        {
+          "text": "Section 9（No.801〜900）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 10（No.901〜1000）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 11（No.1001〜1100）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 12（No.1101〜1200）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 13（No.1201〜1300）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 14（No.1301〜1400）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 15（No.1401〜1500）",
+          "minutes": 30
+        }
+      ]
+    },
+    {
+      "title": "Part 3 ここで差がつく難単語400語",
+      "note": "要確認: Part名・Section範囲",
+      "items": [
+        {
+          "text": "Section 16（No.1501〜1600）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 17（No.1601〜1700）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 18（No.1701〜1800）",
+          "minutes": 30
+        },
+        {
+          "text": "Section 19（No.1801〜1900）",
+          "minutes": 30
+        }
+      ]
+    }
+  ]
+}

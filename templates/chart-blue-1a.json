@@ -1,0 +1,998 @@
+{
+  "id": "chart-blue-1a",
+  "name": "青チャート 数学I+A（増補改訂版）",
+  "subject": "数学",
+  "publisher": "数研出版",
+  "edition": "増補改訂版",
+  "color": "#4A90D9",
+  "verified": false,
+  "reviewNote": "要確認: 章構成は学習指導要領の単元名ベースのプレースホルダ。実書の目次・例題数（基本例題/重要例題の通し番号）と照合して修正すること",
+  "chapters": [
+    {
+      "title": "第1章 数と式",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題1",
+          "minutes": 20
+        },
+        {
+          "text": "例題2",
+          "minutes": 20
+        },
+        {
+          "text": "例題3",
+          "minutes": 20
+        },
+        {
+          "text": "例題4",
+          "minutes": 20
+        },
+        {
+          "text": "例題5",
+          "minutes": 20
+        },
+        {
+          "text": "例題6",
+          "minutes": 20
+        },
+        {
+          "text": "例題7",
+          "minutes": 20
+        },
+        {
+          "text": "例題8",
+          "minutes": 20
+        },
+        {
+          "text": "例題9",
+          "minutes": 20
+        },
+        {
+          "text": "例題10",
+          "minutes": 20
+        },
+        {
+          "text": "例題11",
+          "minutes": 20
+        },
+        {
+          "text": "例題12",
+          "minutes": 20
+        },
+        {
+          "text": "例題13",
+          "minutes": 20
+        },
+        {
+          "text": "例題14",
+          "minutes": 20
+        },
+        {
+          "text": "例題15",
+          "minutes": 20
+        },
+        {
+          "text": "例題16",
+          "minutes": 20
+        },
+        {
+          "text": "例題17",
+          "minutes": 20
+        },
+        {
+          "text": "例題18",
+          "minutes": 20
+        },
+        {
+          "text": "例題19",
+          "minutes": 20
+        },
+        {
+          "text": "例題20",
+          "minutes": 20
+        },
+        {
+          "text": "例題21",
+          "minutes": 20
+        },
+        {
+          "text": "例題22",
+          "minutes": 20
+        },
+        {
+          "text": "例題23",
+          "minutes": 20
+        },
+        {
+          "text": "例題24",
+          "minutes": 20
+        },
+        {
+          "text": "例題25",
+          "minutes": 20
+        },
+        {
+          "text": "例題26",
+          "minutes": 20
+        },
+        {
+          "text": "例題27",
+          "minutes": 20
+        },
+        {
+          "text": "例題28",
+          "minutes": 20
+        },
+        {
+          "text": "例題29",
+          "minutes": 20
+        },
+        {
+          "text": "例題30",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第2章 集合と命題",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題31",
+          "minutes": 20
+        },
+        {
+          "text": "例題32",
+          "minutes": 20
+        },
+        {
+          "text": "例題33",
+          "minutes": 20
+        },
+        {
+          "text": "例題34",
+          "minutes": 20
+        },
+        {
+          "text": "例題35",
+          "minutes": 20
+        },
+        {
+          "text": "例題36",
+          "minutes": 20
+        },
+        {
+          "text": "例題37",
+          "minutes": 20
+        },
+        {
+          "text": "例題38",
+          "minutes": 20
+        },
+        {
+          "text": "例題39",
+          "minutes": 20
+        },
+        {
+          "text": "例題40",
+          "minutes": 20
+        },
+        {
+          "text": "例題41",
+          "minutes": 20
+        },
+        {
+          "text": "例題42",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第3章 2次関数",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題43",
+          "minutes": 20
+        },
+        {
+          "text": "例題44",
+          "minutes": 20
+        },
+        {
+          "text": "例題45",
+          "minutes": 20
+        },
+        {
+          "text": "例題46",
+          "minutes": 20
+        },
+        {
+          "text": "例題47",
+          "minutes": 20
+        },
+        {
+          "text": "例題48",
+          "minutes": 20
+        },
+        {
+          "text": "例題49",
+          "minutes": 20
+        },
+        {
+          "text": "例題50",
+          "minutes": 20
+        },
+        {
+          "text": "例題51",
+          "minutes": 20
+        },
+        {
+          "text": "例題52",
+          "minutes": 20
+        },
+        {
+          "text": "例題53",
+          "minutes": 20
+        },
+        {
+          "text": "例題54",
+          "minutes": 20
+        },
+        {
+          "text": "例題55",
+          "minutes": 20
+        },
+        {
+          "text": "例題56",
+          "minutes": 20
+        },
+        {
+          "text": "例題57",
+          "minutes": 20
+        },
+        {
+          "text": "例題58",
+          "minutes": 20
+        },
+        {
+          "text": "例題59",
+          "minutes": 20
+        },
+        {
+          "text": "例題60",
+          "minutes": 20
+        },
+        {
+          "text": "例題61",
+          "minutes": 20
+        },
+        {
+          "text": "例題62",
+          "minutes": 20
+        },
+        {
+          "text": "例題63",
+          "minutes": 20
+        },
+        {
+          "text": "例題64",
+          "minutes": 20
+        },
+        {
+          "text": "例題65",
+          "minutes": 20
+        },
+        {
+          "text": "例題66",
+          "minutes": 20
+        },
+        {
+          "text": "例題67",
+          "minutes": 20
+        },
+        {
+          "text": "例題68",
+          "minutes": 20
+        },
+        {
+          "text": "例題69",
+          "minutes": 20
+        },
+        {
+          "text": "例題70",
+          "minutes": 20
+        },
+        {
+          "text": "例題71",
+          "minutes": 20
+        },
+        {
+          "text": "例題72",
+          "minutes": 20
+        },
+        {
+          "text": "例題73",
+          "minutes": 20
+        },
+        {
+          "text": "例題74",
+          "minutes": 20
+        },
+        {
+          "text": "例題75",
+          "minutes": 20
+        },
+        {
+          "text": "例題76",
+          "minutes": 20
+        },
+        {
+          "text": "例題77",
+          "minutes": 20
+        },
+        {
+          "text": "例題78",
+          "minutes": 20
+        },
+        {
+          "text": "例題79",
+          "minutes": 20
+        },
+        {
+          "text": "例題80",
+          "minutes": 20
+        },
+        {
+          "text": "例題81",
+          "minutes": 20
+        },
+        {
+          "text": "例題82",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第4章 図形と計量",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題83",
+          "minutes": 20
+        },
+        {
+          "text": "例題84",
+          "minutes": 20
+        },
+        {
+          "text": "例題85",
+          "minutes": 20
+        },
+        {
+          "text": "例題86",
+          "minutes": 20
+        },
+        {
+          "text": "例題87",
+          "minutes": 20
+        },
+        {
+          "text": "例題88",
+          "minutes": 20
+        },
+        {
+          "text": "例題89",
+          "minutes": 20
+        },
+        {
+          "text": "例題90",
+          "minutes": 20
+        },
+        {
+          "text": "例題91",
+          "minutes": 20
+        },
+        {
+          "text": "例題92",
+          "minutes": 20
+        },
+        {
+          "text": "例題93",
+          "minutes": 20
+        },
+        {
+          "text": "例題94",
+          "minutes": 20
+        },
+        {
+          "text": "例題95",
+          "minutes": 20
+        },
+        {
+          "text": "例題96",
+          "minutes": 20
+        },
+        {
+          "text": "例題97",
+          "minutes": 20
+        },
+        {
+          "text": "例題98",
+          "minutes": 20
+        },
+        {
+          "text": "例題99",
+          "minutes": 20
+        },
+        {
+          "text": "例題100",
+          "minutes": 20
+        },
+        {
+          "text": "例題101",
+          "minutes": 20
+        },
+        {
+          "text": "例題102",
+          "minutes": 20
+        },
+        {
+          "text": "例題103",
+          "minutes": 20
+        },
+        {
+          "text": "例題104",
+          "minutes": 20
+        },
+        {
+          "text": "例題105",
+          "minutes": 20
+        },
+        {
+          "text": "例題106",
+          "minutes": 20
+        },
+        {
+          "text": "例題107",
+          "minutes": 20
+        },
+        {
+          "text": "例題108",
+          "minutes": 20
+        },
+        {
+          "text": "例題109",
+          "minutes": 20
+        },
+        {
+          "text": "例題110",
+          "minutes": 20
+        },
+        {
+          "text": "例題111",
+          "minutes": 20
+        },
+        {
+          "text": "例題112",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第5章 データの分析",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題113",
+          "minutes": 20
+        },
+        {
+          "text": "例題114",
+          "minutes": 20
+        },
+        {
+          "text": "例題115",
+          "minutes": 20
+        },
+        {
+          "text": "例題116",
+          "minutes": 20
+        },
+        {
+          "text": "例題117",
+          "minutes": 20
+        },
+        {
+          "text": "例題118",
+          "minutes": 20
+        },
+        {
+          "text": "例題119",
+          "minutes": 20
+        },
+        {
+          "text": "例題120",
+          "minutes": 20
+        },
+        {
+          "text": "例題121",
+          "minutes": 20
+        },
+        {
+          "text": "例題122",
+          "minutes": 20
+        },
+        {
+          "text": "例題123",
+          "minutes": 20
+        },
+        {
+          "text": "例題124",
+          "minutes": 20
+        },
+        {
+          "text": "例題125",
+          "minutes": 20
+        },
+        {
+          "text": "例題126",
+          "minutes": 20
+        },
+        {
+          "text": "例題127",
+          "minutes": 20
+        },
+        {
+          "text": "例題128",
+          "minutes": 20
+        },
+        {
+          "text": "例題129",
+          "minutes": 20
+        },
+        {
+          "text": "例題130",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第6章 場合の数",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題131",
+          "minutes": 20
+        },
+        {
+          "text": "例題132",
+          "minutes": 20
+        },
+        {
+          "text": "例題133",
+          "minutes": 20
+        },
+        {
+          "text": "例題134",
+          "minutes": 20
+        },
+        {
+          "text": "例題135",
+          "minutes": 20
+        },
+        {
+          "text": "例題136",
+          "minutes": 20
+        },
+        {
+          "text": "例題137",
+          "minutes": 20
+        },
+        {
+          "text": "例題138",
+          "minutes": 20
+        },
+        {
+          "text": "例題139",
+          "minutes": 20
+        },
+        {
+          "text": "例題140",
+          "minutes": 20
+        },
+        {
+          "text": "例題141",
+          "minutes": 20
+        },
+        {
+          "text": "例題142",
+          "minutes": 20
+        },
+        {
+          "text": "例題143",
+          "minutes": 20
+        },
+        {
+          "text": "例題144",
+          "minutes": 20
+        },
+        {
+          "text": "例題145",
+          "minutes": 20
+        },
+        {
+          "text": "例題146",
+          "minutes": 20
+        },
+        {
+          "text": "例題147",
+          "minutes": 20
+        },
+        {
+          "text": "例題148",
+          "minutes": 20
+        },
+        {
+          "text": "例題149",
+          "minutes": 20
+        },
+        {
+          "text": "例題150",
+          "minutes": 20
+        },
+        {
+          "text": "例題151",
+          "minutes": 20
+        },
+        {
+          "text": "例題152",
+          "minutes": 20
+        },
+        {
+          "text": "例題153",
+          "minutes": 20
+        },
+        {
+          "text": "例題154",
+          "minutes": 20
+        },
+        {
+          "text": "例題155",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第7章 確率",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題156",
+          "minutes": 20
+        },
+        {
+          "text": "例題157",
+          "minutes": 20
+        },
+        {
+          "text": "例題158",
+          "minutes": 20
+        },
+        {
+          "text": "例題159",
+          "minutes": 20
+        },
+        {
+          "text": "例題160",
+          "minutes": 20
+        },
+        {
+          "text": "例題161",
+          "minutes": 20
+        },
+        {
+          "text": "例題162",
+          "minutes": 20
+        },
+        {
+          "text": "例題163",
+          "minutes": 20
+        },
+        {
+          "text": "例題164",
+          "minutes": 20
+        },
+        {
+          "text": "例題165",
+          "minutes": 20
+        },
+        {
+          "text": "例題166",
+          "minutes": 20
+        },
+        {
+          "text": "例題167",
+          "minutes": 20
+        },
+        {
+          "text": "例題168",
+          "minutes": 20
+        },
+        {
+          "text": "例題169",
+          "minutes": 20
+        },
+        {
+          "text": "例題170",
+          "minutes": 20
+        },
+        {
+          "text": "例題171",
+          "minutes": 20
+        },
+        {
+          "text": "例題172",
+          "minutes": 20
+        },
+        {
+          "text": "例題173",
+          "minutes": 20
+        },
+        {
+          "text": "例題174",
+          "minutes": 20
+        },
+        {
+          "text": "例題175",
+          "minutes": 20
+        },
+        {
+          "text": "例題176",
+          "minutes": 20
+        },
+        {
+          "text": "例題177",
+          "minutes": 20
+        },
+        {
+          "text": "例題178",
+          "minutes": 20
+        },
+        {
+          "text": "例題179",
+          "minutes": 20
+        },
+        {
+          "text": "例題180",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第8章 図形の性質",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題181",
+          "minutes": 20
+        },
+        {
+          "text": "例題182",
+          "minutes": 20
+        },
+        {
+          "text": "例題183",
+          "minutes": 20
+        },
+        {
+          "text": "例題184",
+          "minutes": 20
+        },
+        {
+          "text": "例題185",
+          "minutes": 20
+        },
+        {
+          "text": "例題186",
+          "minutes": 20
+        },
+        {
+          "text": "例題187",
+          "minutes": 20
+        },
+        {
+          "text": "例題188",
+          "minutes": 20
+        },
+        {
+          "text": "例題189",
+          "minutes": 20
+        },
+        {
+          "text": "例題190",
+          "minutes": 20
+        },
+        {
+          "text": "例題191",
+          "minutes": 20
+        },
+        {
+          "text": "例題192",
+          "minutes": 20
+        },
+        {
+          "text": "例題193",
+          "minutes": 20
+        },
+        {
+          "text": "例題194",
+          "minutes": 20
+        },
+        {
+          "text": "例題195",
+          "minutes": 20
+        },
+        {
+          "text": "例題196",
+          "minutes": 20
+        },
+        {
+          "text": "例題197",
+          "minutes": 20
+        },
+        {
+          "text": "例題198",
+          "minutes": 20
+        },
+        {
+          "text": "例題199",
+          "minutes": 20
+        },
+        {
+          "text": "例題200",
+          "minutes": 20
+        },
+        {
+          "text": "例題201",
+          "minutes": 20
+        },
+        {
+          "text": "例題202",
+          "minutes": 20
+        },
+        {
+          "text": "例題203",
+          "minutes": 20
+        },
+        {
+          "text": "例題204",
+          "minutes": 20
+        },
+        {
+          "text": "例題205",
+          "minutes": 20
+        },
+        {
+          "text": "例題206",
+          "minutes": 20
+        },
+        {
+          "text": "例題207",
+          "minutes": 20
+        },
+        {
+          "text": "例題208",
+          "minutes": 20
+        }
+      ]
+    },
+    {
+      "title": "第9章 数学と人間の活動",
+      "note": "要確認: この章の例題数・番号範囲はプレースホルダ。実書と照合すること",
+      "items": [
+        {
+          "text": "例題209",
+          "minutes": 20
+        },
+        {
+          "text": "例題210",
+          "minutes": 20
+        },
+        {
+          "text": "例題211",
+          "minutes": 20
+        },
+        {
+          "text": "例題212",
+          "minutes": 20
+        },
+        {
+          "text": "例題213",
+          "minutes": 20
+        },
+        {
+          "text": "例題214",
+          "minutes": 20
+        },
+        {
+          "text": "例題215",
+          "minutes": 20
+        },
+        {
+          "text": "例題216",
+          "minutes": 20
+        },
+        {
+          "text": "例題217",
+          "minutes": 20
+        },
+        {
+          "text": "例題218",
+          "minutes": 20
+        },
+        {
+          "text": "例題219",
+          "minutes": 20
+        },
+        {
+          "text": "例題220",
+          "minutes": 20
+        },
+        {
+          "text": "例題221",
+          "minutes": 20
+        },
+        {
+          "text": "例題222",
+          "minutes": 20
+        },
+        {
+          "text": "例題223",
+          "minutes": 20
+        },
+        {
+          "text": "例題224",
+          "minutes": 20
+        },
+        {
+          "text": "例題225",
+          "minutes": 20
+        },
+        {
+          "text": "例題226",
+          "minutes": 20
+        },
+        {
+          "text": "例題227",
+          "minutes": 20
+        },
+        {
+          "text": "例題228",
+          "minutes": 20
+        },
+        {
+          "text": "例題229",
+          "minutes": 20
+        },
+        {
+          "text": "例題230",
+          "minutes": 20
+        },
+        {
+          "text": "例題231",
+          "minutes": 20
+        },
+        {
+          "text": "例題232",
+          "minutes": 20
+        },
+        {
+          "text": "例題233",
+          "minutes": 20
+        }
+      ]
+    }
+  ]
+}

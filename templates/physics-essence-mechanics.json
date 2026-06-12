@@ -1,0 +1,476 @@
+{
+  "id": "physics-essence-mechanics",
+  "name": "物理のエッセンス 力学・波動（四訂版）力学編",
+  "subject": "物理",
+  "publisher": "河合出版",
+  "edition": "四訂版",
+  "color": "#D14545",
+  "verified": false,
+  "reviewNote": "要確認: 章構成は力学分野の標準的な単元名ベースのプレースホルダ（波動編は未収録）。実書の目次・問題番号（EX/問）と照合して修正すること",
+  "chapters": [
+    {
+      "title": "第1章 速度・加速度",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第2章 落体の運動",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第3章 力のつり合い",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        },
+        {
+          "text": "問13",
+          "minutes": 15
+        },
+        {
+          "text": "問14",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第4章 運動の法則",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        },
+        {
+          "text": "問13",
+          "minutes": 15
+        },
+        {
+          "text": "問14",
+          "minutes": 15
+        },
+        {
+          "text": "問15",
+          "minutes": 15
+        },
+        {
+          "text": "問16",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第5章 エネルギー",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        },
+        {
+          "text": "問13",
+          "minutes": 15
+        },
+        {
+          "text": "問14",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第6章 運動量",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第7章 円運動・万有引力",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        },
+        {
+          "text": "問13",
+          "minutes": 15
+        },
+        {
+          "text": "問14",
+          "minutes": 15
+        }
+      ]
+    },
+    {
+      "title": "第8章 単振動",
+      "note": "要確認: 章タイトル・問題数はプレースホルダ。実書の目次・問番号と照合すること",
+      "items": [
+        {
+          "text": "問1",
+          "minutes": 15
+        },
+        {
+          "text": "問2",
+          "minutes": 15
+        },
+        {
+          "text": "問3",
+          "minutes": 15
+        },
+        {
+          "text": "問4",
+          "minutes": 15
+        },
+        {
+          "text": "問5",
+          "minutes": 15
+        },
+        {
+          "text": "問6",
+          "minutes": 15
+        },
+        {
+          "text": "問7",
+          "minutes": 15
+        },
+        {
+          "text": "問8",
+          "minutes": 15
+        },
+        {
+          "text": "問9",
+          "minutes": 15
+        },
+        {
+          "text": "問10",
+          "minutes": 15
+        },
+        {
+          "text": "問11",
+          "minutes": 15
+        },
+        {
+          "text": "問12",
+          "minutes": 15
+        }
+      ]
+    }
+  ]
+}

@@ -1914,6 +1914,35 @@ function ChildAdder({ onAdd, onBulkAdd, subjectColor, parentText, materialMode, 
   );
 }
 
+/* ── 市販教材テンプレート ──
+   templates/index.json（マニフェスト）と templates/<id>.json（教材データ）を
+   fetch で遅延読み込みする。file:// 直開き等で fetch できない環境では
+   マニフェストが null のままになり、テンプレ機能のUIだけ非表示になる。 */
+let _tplManifestCache; // undefined=未取得 / null=取得不可 / 配列=取得済み
+const _tplDataCache = {};
+async function loadTemplateManifest() {
+  if (_tplManifestCache !== undefined) return _tplManifestCache;
+  try {
+    const res = await fetch("templates/index.json");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    _tplManifestCache = Array.isArray(json.templates) ? json.templates : null;
+  } catch (e) {
+    _tplManifestCache = null;
+  }
+  return _tplManifestCache;
+}
+async function loadTemplateData(id) {
+  if (_tplDataCache[id]) return _tplDataCache[id];
+  const res = await fetch(`templates/${id}.json`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  _tplDataCache[id] = json;
+  return json;
+}
+const templateItemCount = (data) =>
+  (data.chapters || []).reduce((s, ch) => s + ((ch.items || []).length), 0);
+
 function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, monthlyPlans, setMonthlyPlans, weeklyPlans, setWeeklyPlans, tasks, setTasks, selectedDate, goals, subjectCategories, setSubjectCategories, settings }) {
   const autoMode = (settings?.scheduleMode ?? "auto") === "auto";
   const chunkBoundary = settings?.chunkBoundary ?? true;
@@ -1956,6 +1985,19 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
   const [autoDistWeekdays, setAutoDistWeekdays] = useState([0, 1, 2, 3, 4, 5, 6]);
   // 章を横断して例題を1問ずつ巡回配置する（幅優先・広く学ぶ）。
   const [autoDistInterleave, setAutoDistInterleave] = useState(false);
+  // 市販教材テンプレート: マニフェスト（null=未取得or取得不可）と選択モーダルの状態
+  const [tplCatalog, setTplCatalog] = useState(_tplManifestCache || null);
+  const [tplPickerOpen, setTplPickerOpen] = useState(false);
+  const [tplSearch, setTplSearch] = useState("");
+  const [tplFilterSubject, setTplFilterSubject] = useState("all");
+  const [tplLoadingId, setTplLoadingId] = useState(null);
+  const [tplPreview, setTplPreview] = useState(null); // 取り込み前の確認画面に表示する教材データ
+
+  useEffect(() => {
+    let alive = true;
+    loadTemplateManifest().then(list => { if (alive && list) setTplCatalog(list); });
+    return () => { alive = false; };
+  }, []);
 
   const COLORS = [C.blue, C.green, C.accent, C.purple, C.red, C.yellow];
 
@@ -1985,6 +2027,60 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
     setSubjectTodos(ts => ts.filter(t => t.subjectId !== id));
     if (activeSubject === id) setActiveSubject(null);
     setConfirmDelete(null);
+  };
+
+  const closeTplPicker = () => {
+    setTplPickerOpen(false);
+    setTplPreview(null);
+    setTplSearch("");
+    setTplFilterSubject("all");
+    setTplLoadingId(null);
+  };
+
+  const openTplPreview = async (entry) => {
+    if (tplLoadingId) return;
+    setTplLoadingId(entry.id);
+    try {
+      const data = await loadTemplateData(entry.id);
+      setTplPreview(data);
+    } catch (e) {
+      alert("テンプレートの読み込みに失敗しました。通信環境を確認してください。");
+    }
+    setTplLoadingId(null);
+  };
+
+  // テンプレ取り込み: 科目が無ければ追加 → 教材を1件追加 → 章のitemsを問題として展開。
+  // 章タイトルは text の接頭辞として付与（章付き一括追加と同じ形式）。
+  const importTemplate = (data) => {
+    if (subjects.some(s => s.templateId === data.id)) {
+      if (!confirm(`「${data.name}」は既に取り込み済みです。\nもう一度取り込むと教材が重複して作成されます。続けますか？`)) return;
+    }
+    const cat = (data.subject || "").trim() || activeCategory;
+    if (!allCategories.includes(cat)) {
+      setSubjectCategories(cs => [...(cs || []), cat]);
+    }
+    const id = genId();
+    setSubjects(ss => [...ss, { id, name: data.name, color: data.color || C.blue, category: cat, templateId: data.id }]);
+    const now = Date.now();
+    let i = 0;
+    const newTodos = [];
+    (data.chapters || []).forEach(ch => {
+      const titlePrefix = (ch.title || "").trim() ? `${ch.title.trim()} ` : "";
+      (ch.items || []).forEach(item => {
+        if (!item || !item.text) return;
+        newTodos.push({
+          id: genId(), subjectId: id,
+          text: titlePrefix + item.text,
+          minutes: (typeof item.minutes === "number" && item.minutes > 0) ? item.minutes : null,
+          status: "unwatched", done: false, createdAt: now + (i++),
+        });
+      });
+    });
+    if (newTodos.length) setSubjectTodos(ts => [...ts, ...newTodos]);
+    setActiveCategory(cat);
+    setActiveSubject(id);
+    setShowSubjectForm(false);
+    closeTplPicker();
   };
 
   const addTodo = () => {
@@ -2568,8 +2664,142 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
             ))}
           </div>
           <button onClick={addSubject} style={{ ...btn(true, C.accent, { width: "100%", padding: "9px" }) }}>追加</button>
+          {tplCatalog && tplCatalog.length > 0 && (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "12px 0 8px" }}>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+                <span style={{ fontSize: 10, color: C.textDim }}>または</span>
+                <div style={{ flex: 1, height: 1, background: C.border }} />
+              </div>
+              <button onClick={() => setTplPickerOpen(true)}
+                style={{ ...btn(false, C.purple, { width: "100%", padding: "9px", color: C.purple, borderColor: C.purple }) }}>
+                📚 テンプレートから追加（市販教材）
+              </button>
+              <div style={{ fontSize: 10, color: C.textDim, marginTop: 6, textAlign: "center" }}>
+                参考書・問題集の問題リストを一括登録できます
+              </div>
+            </>
+          )}
         </div>
       )}
+
+      {/* テンプレート選択モーダル */}
+      {tplPickerOpen && (() => {
+        const tplSubjects = [...new Set((tplCatalog || []).map(t => t.subject).filter(Boolean))];
+        const q = tplSearch.trim().toLowerCase();
+        const filtered = (tplCatalog || []).filter(t =>
+          (tplFilterSubject === "all" || t.subject === tplFilterSubject) &&
+          (!q || `${t.name} ${t.publisher || ""} ${t.subject || ""}`.toLowerCase().includes(q))
+        );
+        const pv = tplPreview;
+        const pvCount = pv ? templateItemCount(pv) : 0;
+        return (
+          <div style={{
+            position: "fixed", inset: 0, background: "#0008", zIndex: 100,
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+          }} onClick={closeTplPicker}>
+            <div style={{ ...card({ maxWidth: 440, width: "100%", maxHeight: "85vh", overflowY: "auto", overflowX: "hidden" }) }}
+              onClick={e => e.stopPropagation()}>
+              {!pv ? (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+                    <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.purple }}>📚 テンプレートから追加</div>
+                    <button onClick={closeTplPicker}
+                      style={{ ...btn(false, C.textMid, { padding: "4px 10px", fontSize: 12 }) }}>✕</button>
+                  </div>
+                  <input style={input({ marginBottom: 8 })} placeholder="書名・出版社で検索..."
+                    value={tplSearch} onChange={e => setTplSearch(e.target.value)} />
+                  <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 4, marginBottom: 8 }}>
+                    {["all", ...tplSubjects].map(s => (
+                      <button key={s} onClick={() => setTplFilterSubject(s)}
+                        style={{ ...btn(tplFilterSubject === s, C.purple, { fontSize: 11, padding: "5px 10px", whiteSpace: "nowrap", flexShrink: 0 }) }}>
+                        {s === "all" ? "すべて" : s}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {filtered.length === 0 && (
+                      <div style={{ fontSize: 12, color: C.textDim, textAlign: "center", padding: "16px 0" }}>
+                        該当するテンプレートがありません
+                      </div>
+                    )}
+                    {filtered.map(t => {
+                      const imported = subjects.some(s => s.templateId === t.id);
+                      return (
+                        <button key={t.id} onClick={() => openTplPreview(t)} disabled={tplLoadingId !== null}
+                          style={{
+                            padding: "10px 12px", borderRadius: 8, textAlign: "left",
+                            background: C.surfaceUp, border: `1px solid ${C.border}`,
+                            cursor: "pointer", fontFamily: font,
+                            opacity: tplLoadingId && tplLoadingId !== t.id ? 0.5 : 1,
+                          }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>
+                            {tplLoadingId === t.id ? "読み込み中... " : ""}{t.name}
+                          </div>
+                          <div style={{ fontSize: 11, color: C.textMid, marginTop: 2, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                            <span style={{
+                              padding: "1px 7px", borderRadius: 8, fontSize: 10,
+                              background: C.purpleDim, color: C.purple, fontWeight: 600,
+                            }}>{t.subject}</span>
+                            <span>{t.publisher}{t.edition ? `・${t.edition}` : ""}</span>
+                            <span>{t.itemCount}問</span>
+                            {t.verified === false && <span style={{ color: C.yellow }}>⚠ 要確認</span>}
+                            {imported && <span style={{ color: C.green }}>✓ 取り込み済み</span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+                    <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.purple }}>取り込み内容の確認</div>
+                    <button onClick={closeTplPicker}
+                      style={{ ...btn(false, C.textMid, { padding: "4px 10px", fontSize: 12 }) }}>✕</button>
+                  </div>
+                  <div style={{ ...card({ padding: 14, background: C.surfaceUp, borderLeft: `4px solid ${pv.color || C.blue}`, marginBottom: 10 }) }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{pv.name}</div>
+                    <div style={{ fontSize: 12, color: C.textMid, marginTop: 4 }}>
+                      {pv.publisher}{pv.edition ? `・${pv.edition}` : ""}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textMid, marginTop: 6, display: "flex", gap: 12 }}>
+                      <span>科目: <b style={{ color: C.text }}>{pv.subject}</b></span>
+                      <span>{(pv.chapters || []).length}章</span>
+                      <span><b style={{ color: pv.color || C.blue }}>{pvCount}</b>問</span>
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: "10px 12px", borderRadius: 8, marginBottom: 10,
+                    background: C.yellowDim, border: `1px solid ${C.yellow}40`,
+                    fontSize: 11, color: C.textMid, lineHeight: 1.6,
+                  }}>
+                    ⚠ お持ちの版と問題番号が異なる場合があります。取り込み後に問題の編集・削除で調整できます。
+                    {pv.verified === false && (
+                      <div style={{ marginTop: 4, color: C.yellow, fontWeight: 600 }}>
+                        このテンプレートの章構成・問題数は未確認です。実際の書籍と異なる可能性があります。
+                      </div>
+                    )}
+                  </div>
+                  {!allCategories.includes((pv.subject || "").trim()) && (pv.subject || "").trim() && (
+                    <div style={{ fontSize: 11, color: C.textMid, marginBottom: 10 }}>
+                      ※ 科目「{pv.subject}」が新しく作成されます
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => importTemplate(pv)}
+                      style={{ ...btn(true, pv.color || C.blue, { flex: 1, padding: "9px", fontSize: 13 }) }}>
+                      取り込む（{pvCount}問）
+                    </button>
+                    <button onClick={() => setTplPreview(null)}
+                      style={{ ...btn(false, C.textMid, { padding: "9px 14px", fontSize: 12 }) }}>戻る</button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Subject content */}
       {activeSubjectData ? (
