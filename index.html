@@ -4853,7 +4853,92 @@ function GoalsView({ goals, setGoals, subjects }) {
 /* ══════════════════════════════════════════════════════
    SETTINGS MODAL
 ══════════════════════════════════════════════════════ */
-function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syncStatus, lastSyncedAt, manualPull }) {
+/* ══════════════════════════════════════════════════════
+   FIRST-TIME GUIDE（初回起動時の使い方ガイド）
+══════════════════════════════════════════════════════ */
+const GUIDE_STEPS = [
+  {
+    icon: "👋",
+    title: "DayFlowへようこそ",
+    body: [
+      "DayFlowは、学習計画・間隔反復・振り返りを1つにまとめた学習プランナーです。",
+      "上のタブで「今日」「振り返り」「科目」「週次」「月次」「ゴール」の画面を切り替えて使います。",
+    ],
+  },
+  {
+    icon: "🎯",
+    title: "まずはゴールと科目を登録",
+    body: [
+      "「ゴール」タブで目指す目標（志望校・資格など）を登録します。",
+      "「科目」タブで教材を登録し、章や問題などの「やること」を追加していきます。",
+    ],
+  },
+  {
+    icon: "⚡",
+    title: "予定は自動でおまかせ",
+    body: [
+      "「科目」画面の「⚡ 自動分配」を押すと、登録した「やること」が試験日まで（未設定なら直近の期間）の毎日に自動で割り振られます。",
+      "自分で予定を組みたい場合は、設定 ⚙ で「手動」に切り替えると、月→週→日へ自分で割り振れます。",
+    ],
+  },
+  {
+    icon: "🌅",
+    title: "今日のタスクをこなす",
+    body: [
+      "「今日」タブでその日のタスクを確認し、終わったらチェックします。",
+      "問題演習では「解けた／解けなかった」を選ぶと理解度が ✖️→△→○→◎ と記録され、✖️は翌日・△は3日後・○は1週間後に復習タスクが自動で入ります（間隔反復）。",
+    ],
+  },
+  {
+    icon: "🌙",
+    title: "夜は振り返り、データは同期",
+    body: [
+      "1日の終わりに「振り返り」タブでその日を記録します。20時を過ぎて未記録だとタブに赤い印が出ます。",
+      "設定 ⚙ からメールでログインすると、データがクラウドに同期され、複数の端末で使えます。このガイドは設定からいつでも見直せます。",
+    ],
+  },
+];
+
+function GuideModal({ onClose }) {
+  const [step, setStep] = useState(0);
+  const s = GUIDE_STEPS[step];
+  const last = step === GUIDE_STEPS.length - 1;
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "#0008", zIndex: 120,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+    }}>
+      <div style={{ ...card({ maxWidth: 360, width: "100%", padding: 24, maxHeight: "85vh", overflowY: "auto" }) }}>
+        <div style={{ textAlign: "center", fontSize: 40, marginBottom: 10 }}>{s.icon}</div>
+        <div style={{ fontFamily: serif, fontSize: 18, color: C.accent, textAlign: "center", marginBottom: 12 }}>{s.title}</div>
+        {s.body.map((line, i) => (
+          <div key={i} style={{ fontSize: 12.5, color: C.text, lineHeight: 1.7, marginBottom: 8 }}>{line}</div>
+        ))}
+        <div style={{ display: "flex", justifyContent: "center", gap: 6, margin: "14px 0" }}>
+          {GUIDE_STEPS.map((_, i) => (
+            <span key={i} onClick={() => setStep(i)} style={{
+              width: 8, height: 8, borderRadius: "50%", cursor: "pointer",
+              background: i === step ? C.accent : C.border,
+            }} />
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          {step > 0 ? (
+            <button onClick={() => setStep(step - 1)} style={{ ...btn(false, C.textMid, { flex: 1, padding: "9px" }) }}>戻る</button>
+          ) : (
+            <button onClick={onClose} style={{ ...btn(false, C.textMid, { flex: 1, padding: "9px" }) }}>スキップ</button>
+          )}
+          <button onClick={() => (last ? onClose() : setStep(step + 1))}
+            style={{ ...btn(true, C.accent, { flex: 2, padding: "9px" }) }}>
+            {last ? "はじめる" : "次へ"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syncStatus, lastSyncedAt, manualPull, onShowGuide }) {
   const [local, setLocal] = useState({ dayStartHour: 5, dayEndHour: 26, examDate: "", examLabel: "", scheduleMode: "auto", chunkBoundary: true, ...settings });
   const [confirmReset, setConfirmReset] = useState(false);
   // メールOTPログイン用のローカル状態
@@ -5033,6 +5118,12 @@ function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syn
             style={{ ...btn(true, C.accent, { flex: 1, padding: "9px" }) }}>保存</button>
           <button onClick={onClose} style={{ ...btn(false, C.textMid, { flex: 1, padding: "9px" }) }}>キャンセル</button>
         </div>
+        <div style={{ paddingTop: 14, borderTop: `1px solid ${C.border}`, marginBottom: 16 }}>
+          <button onClick={onShowGuide}
+            style={{ ...btn(false, C.accent, { width: "100%", padding: "8px", fontSize: 12 }) }}>
+            📖 使い方ガイドを見る
+          </button>
+        </div>
         <div style={{ paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
           <div style={{ fontSize: 11, color: C.textMid, marginBottom: 6 }}>データ管理</div>
           <button onClick={() => {
@@ -5144,6 +5235,9 @@ function App() {
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
   const [lastSyncedAt, setLastSyncedAt] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  // 初回起動時の使い方ガイド。一度閉じたら端末（localStorage）に記録して以後は出さない。
+  const [guideSeen, setGuideSeen] = usePersistedState("guideSeen", false);
+  const [showGuide, setShowGuide] = useState(false);
   const initialPulledRef = useRef(false);
   const lastPushedDataRef = useRef("");
 
@@ -5308,7 +5402,10 @@ function App() {
       </div>
 
       {showSettings && <SettingsModal settings={settings} setSettings={setSettings} onClose={() => setShowSettings(false)} onReset={resetAll}
-        syncEmail={syncEmail} syncStatus={syncStatus} lastSyncedAt={lastSyncedAt} manualPull={manualPull} />}
+        syncEmail={syncEmail} syncStatus={syncStatus} lastSyncedAt={lastSyncedAt} manualPull={manualPull}
+        onShowGuide={() => { setShowSettings(false); setShowGuide(true); }} />}
+
+      {(!guideSeen || showGuide) && <GuideModal onClose={() => { setGuideSeen(true); setShowGuide(false); }} />}
     </div>
   );
 }
