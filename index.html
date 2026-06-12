@@ -264,13 +264,13 @@ const VIEWS = [
 
 function Nav({ view, setView, reviewPending }) {
   return (
-    <div style={{
+    <div data-tour="nav" style={{
       display: "flex", gap: 4, padding: "8px 16px",
       background: C.surface, borderBottom: `1px solid ${C.border}`,
       overflowX: "auto", flexShrink: 0,
     }}>
       {VIEWS.map(v => (
-        <button key={v.id} onClick={() => setView(v.id)} style={{
+        <button key={v.id} data-tour={`nav-${v.id}`} onClick={() => setView(v.id)} style={{
           ...btn(view === v.id),
           display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
           padding: "6px 12px",
@@ -757,7 +757,7 @@ function DayView({ tasks, setTasks, selectedDate, setSelectedDate, goals, subjec
       </div>
 
       {/* Add button */}
-      <button onClick={() => {
+      <button data-tour="task-add" onClick={() => {
         if (!showForm) setForm(f => ({ ...f, date: selectedDate }));
         setShowForm(!showForm);
         setEditId(null);
@@ -2546,7 +2546,7 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
             {s.name}
           </button>
         ))}
-        <button onClick={() => setShowSubjectForm(!showSubjectForm)}
+        <button data-tour="subject-add" onClick={() => setShowSubjectForm(!showSubjectForm)}
           style={{
             padding: "8px 12px", borderRadius: 8, background: "transparent",
             color: C.accent, border: `1px dashed ${C.accent}`,
@@ -4800,7 +4800,7 @@ function GoalsView({ goals, setGoals, subjects }) {
         );
       })}
 
-      <button onClick={() => setShowForm(!showForm)} style={{ ...btn(showForm, C.accent, { width: "100%", padding: "10px" }) }}>
+      <button data-tour="goal-add" onClick={() => setShowForm(!showForm)} style={{ ...btn(showForm, C.accent, { width: "100%", padding: "10px" }) }}>
         {showForm ? "✕ 閉じる" : "+ ゴールを追加"}
       </button>
 
@@ -4854,87 +4854,197 @@ function GoalsView({ goals, setGoals, subjects }) {
    SETTINGS MODAL
 ══════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════
-   FIRST-TIME GUIDE（初回起動時の使い方ガイド）
+   FIRST-TIME GUIDE（初回起動時の使い方ツアー）
+   実際の画面を切り替えながら、対象のボタンをスポットライトで
+   照らして案内する。対象は data-tour 属性で探す。
 ══════════════════════════════════════════════════════ */
-const GUIDE_STEPS = [
+const TOUR_STEPS = [
   {
-    icon: "👋",
-    title: "DayFlowへようこそ",
+    view: "day", target: null, icon: "👋", title: "DayFlowへようこそ",
     body: [
-      "DayFlowは、学習計画・間隔反復・振り返りを1つにまとめた学習プランナーです。",
-      "上のタブで「今日」「振り返り」「科目」「週次」「月次」「ゴール」の画面を切り替えて使います。",
+      "DayFlowは、学習計画・復習・振り返りを1つにまとめた学習プランナーです。",
+      "実際の画面を動かしながら、使い方を順番に案内します（1分くらいで終わります）。",
     ],
   },
   {
-    icon: "🎯",
-    title: "まずはゴールと科目を登録",
+    view: "day", target: "nav", icon: "🧭", title: "画面はこのタブで切り替え",
     body: [
-      "「ゴール」タブで目指す目標（志望校・資格など）を登録します。",
-      "「科目」タブで教材を登録し、章や問題などの「やること」を追加していきます。",
+      "「今日」で毎日のタスク、「科目」で教材の管理、「ゴール」で目標の設定をします。",
+      "「振り返り」「週次」「月次」は、記録と計画の確認に使います。",
     ],
   },
   {
-    icon: "⚡",
-    title: "予定は自動でおまかせ",
+    view: "goals", target: "goal-add", icon: "🎯", title: "① まずゴールを決める",
     body: [
-      "「科目」画面の「⚡ 自動分配」を押すと、登録した「やること」が試験日まで（未設定なら直近の期間）の毎日に自動で割り振られます。",
-      "自分で予定を組みたい場合は、設定 ⚙ で「手動」に切り替えると、月→週→日へ自分で割り振れます。",
+      "ここから、目指す目標（志望校・資格・試験など）と期限を登録します。",
+      "ゴールはあとで教材と紐づけられて、達成予測に使われます。",
     ],
   },
   {
-    icon: "🌅",
-    title: "今日のタスクをこなす",
+    view: "subjects", target: "subject-add", icon: "📚", title: "② 教材と「やること」を登録",
     body: [
-      "「今日」タブでその日のタスクを確認し、終わったらチェックします。",
-      "問題演習では「解けた／解けなかった」を選ぶと理解度が ✖️→△→○→◎ と記録され、✖️は翌日・△は3日後・○は1週間後に復習タスクが自動で入ります（間隔反復）。",
+      "ここから教材（参考書・問題集）を追加し、章や問題などの「やること」を入れていきます。",
+      "教材を選ぶと出てくる「⚡ 自動分配」ボタンで、やることが試験日までの毎日に自動で割り振られます。自分で組みたい場合は設定 ⚙ で「手動」に切り替えられます。",
     ],
   },
   {
-    icon: "🌙",
-    title: "夜は振り返り、データは同期",
+    view: "day", target: "task-add", icon: "🌅", title: "③ あとは毎日こなすだけ",
     body: [
-      "1日の終わりに「振り返り」タブでその日を記録します。20時を過ぎて未記録だとタブに赤い印が出ます。",
-      "設定 ⚙ からメールでログインすると、データがクラウドに同期され、複数の端末で使えます。このガイドは設定からいつでも見直せます。",
+      "自動分配した予定はこの「今日」画面に毎日表示されます。単発のタスクはこのボタンから直接追加もできます。",
+      "終わったタスクはタップしてチェックします。",
+    ],
+  },
+  {
+    view: "day", target: null, icon: "🔁", title: "解けなかった問題は自動で復習",
+    body: [
+      "問題を終えるときに「解けた／解けなかった」を選ぶと、理解度マークが1段ずつ進みます。",
+      "◎になるまで、ちょうど忘れかけた頃に復習タスクが自動で入ります（間隔反復）。",
+    ],
+    visual: "ladder",
+  },
+  {
+    view: "review", target: "nav-review", icon: "🌙", title: "④ 夜は1日を振り返る",
+    body: [
+      "1日の終わりに、この「振り返り」画面でその日の達成度を記録します。",
+      "夜8時を過ぎても未記録だと、タブに赤い印が出てお知らせします。",
+    ],
+  },
+  {
+    view: "day", target: "settings", icon: "☁️", title: "データはクラウドに保存できる",
+    body: [
+      "この設定 ⚙ からメールアドレスでログインすると、データが同期されて複数の端末で使えます（ログインしなくてもこの端末だけで使えます）。",
+      "このツアーは、設定の「📖 使い方ガイドを見る」からいつでも見直せます。",
     ],
   },
 ];
 
-function GuideModal({ onClose }) {
-  const [step, setStep] = useState(0);
-  const s = GUIDE_STEPS[step];
-  const last = step === GUIDE_STEPS.length - 1;
+// 間隔反復の流れを図で見せるミニ図解（✖️→△→○→◎）
+function TourLadder() {
+  const items = [
+    { mark: "✖️", label: "翌日" },
+    { mark: "△", label: "3日後" },
+    { mark: "○", label: "1週間後" },
+    { mark: "◎", label: "完了！" },
+  ];
   return (
     <div style={{
-      position: "fixed", inset: 0, background: "#0008", zIndex: 120,
-      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+      display: "flex", alignItems: "center", justifyContent: "center", gap: 2,
+      padding: "10px 6px", margin: "4px 0 10px", borderRadius: 10,
+      background: C.surfaceUp, border: `1px solid ${C.border}`,
     }}>
-      <div style={{ ...card({ maxWidth: 360, width: "100%", padding: 24, maxHeight: "85vh", overflowY: "auto" }) }}>
-        <div style={{ textAlign: "center", fontSize: 40, marginBottom: 10 }}>{s.icon}</div>
-        <div style={{ fontFamily: serif, fontSize: 18, color: C.accent, textAlign: "center", marginBottom: 12 }}>{s.title}</div>
-        {s.body.map((line, i) => (
-          <div key={i} style={{ fontSize: 12.5, color: C.text, lineHeight: 1.7, marginBottom: 8 }}>{line}</div>
-        ))}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, margin: "14px 0" }}>
-          {GUIDE_STEPS.map((_, i) => (
-            <span key={i} onClick={() => setStep(i)} style={{
-              width: 8, height: 8, borderRadius: "50%", cursor: "pointer",
-              background: i === step ? C.accent : C.border,
-            }} />
-          ))}
+      {items.map((it, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <span style={{ color: C.textDim, fontSize: 13, padding: "0 2px" }}>→</span>}
+          <span style={{ textAlign: "center" }}>
+            <span style={{ display: "block", fontSize: 17 }}>{it.mark}</span>
+            <span style={{ display: "block", fontSize: 9, color: i === 3 ? C.green : C.textMid, fontWeight: 600, marginTop: 2 }}>{it.label}</span>
+          </span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function TourOverlay({ setView, onClose }) {
+  const [step, setStep] = useState(0);
+  const [rect, setRect] = useState(null);
+  const s = TOUR_STEPS[step];
+  const last = step === TOUR_STEPS.length - 1;
+
+  // 表示する画面に切り替えてから、対象ボタンの位置を測る。
+  // ビュー切り替え直後はまだ描画されていないことがあるのでリトライする。
+  useEffect(() => {
+    setView(s.view);
+    setRect(null);
+    if (!s.target) return;
+    let cancelled = false;
+    let tries = 0;
+    const measure = () => {
+      if (cancelled) return;
+      const el = document.querySelector(`[data-tour="${s.target}"]`);
+      if (el) {
+        try { el.scrollIntoView({ block: "center" }); } catch {}
+        requestAnimationFrame(() => {
+          if (cancelled) return;
+          const r = el.getBoundingClientRect();
+          setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+        });
+      } else if (tries++ < 20) {
+        setTimeout(measure, 50);
+      }
+    };
+    setTimeout(measure, 80);
+    const onResize = () => { tries = 0; measure(); };
+    window.addEventListener("resize", onResize);
+    return () => { cancelled = true; window.removeEventListener("resize", onResize); };
+  }, [step]);
+
+  const PAD = 6;
+  // 説明カードの位置: 対象が画面の上半分なら下に、下半分なら上に出す
+  const cardPos = !rect
+    ? { top: "50%", left: "50%", transform: "translate(-50%, -50%)" }
+    : (rect.top + rect.height / 2 < window.innerHeight / 2)
+      ? { top: rect.top + rect.height + PAD + 12, left: "50%", transform: "translateX(-50%)" }
+      : { bottom: window.innerHeight - rect.top + PAD + 12, left: "50%", transform: "translateX(-50%)" };
+
+  return (
+    <>
+      {/* ツアー中はアプリ本体の操作をブロック */}
+      <div style={{ position: "fixed", inset: 0, zIndex: 120, background: rect ? "transparent" : "#0009" }} />
+      {/* スポットライト: 対象の周りだけ明るく残して周囲を暗くする */}
+      {rect && (
+        <div style={{
+          position: "fixed", zIndex: 121, pointerEvents: "none",
+          top: rect.top - PAD, left: rect.left - PAD,
+          width: rect.width + PAD * 2, height: rect.height + PAD * 2,
+          borderRadius: 10, border: `2px solid ${C.accent}`,
+          boxShadow: "0 0 0 9999px rgba(10, 10, 18, 0.6), 0 0 14px rgba(201, 122, 74, 0.5)",
+          transition: "all .25s ease",
+        }} />
+      )}
+      {/* 説明カード */}
+      <div style={{
+        ...card({ maxWidth: 330, width: "calc(100% - 40px)", padding: 18 }),
+        position: "fixed", zIndex: 122, ...cardPos,
+        boxShadow: "0 8px 30px rgba(0,0,0,.25)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 22 }}>{s.icon}</span>
+          <span style={{ fontFamily: serif, fontSize: 16, color: C.accent }}>{s.title}</span>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        {s.body.map((line, i) => (
+          <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, marginBottom: 6 }}>{line}</div>
+        ))}
+        {s.visual === "ladder" && <TourLadder />}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+          <span style={{ fontSize: 10, color: C.textDim, fontWeight: 600, flexShrink: 0 }}>{step + 1}/{TOUR_STEPS.length}</span>
+          <div style={{ display: "flex", gap: 4, flex: 1 }}>
+            {TOUR_STEPS.map((_, i) => (
+              <span key={i} style={{
+                height: 3, flex: 1, borderRadius: 2,
+                background: i <= step ? C.accent : C.border,
+              }} />
+            ))}
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           {step > 0 ? (
-            <button onClick={() => setStep(step - 1)} style={{ ...btn(false, C.textMid, { flex: 1, padding: "9px" }) }}>戻る</button>
+            <button onClick={() => setStep(step - 1)} style={{ ...btn(false, C.textMid, { flex: 1, padding: "8px" }) }}>戻る</button>
           ) : (
-            <button onClick={onClose} style={{ ...btn(false, C.textMid, { flex: 1, padding: "9px" }) }}>スキップ</button>
+            <button onClick={onClose} style={{ ...btn(false, C.textMid, { flex: 1, padding: "8px" }) }}>スキップ</button>
           )}
           <button onClick={() => (last ? onClose() : setStep(step + 1))}
-            style={{ ...btn(true, C.accent, { flex: 2, padding: "9px" }) }}>
-            {last ? "はじめる" : "次へ"}
+            style={{ ...btn(true, C.accent, { flex: 2, padding: "8px" }) }}>
+            {last ? "はじめる！" : "次へ"}
           </button>
         </div>
+        {!last && step > 0 && (
+          <div onClick={onClose} style={{ textAlign: "center", fontSize: 10, color: C.textDim, marginTop: 8, cursor: "pointer", textDecoration: "underline" }}>
+            ツアーを終了する
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -5386,7 +5496,7 @@ function App() {
             {syncStatus === "syncing" ? "⟳" : syncStatus === "synced" ? "✓" : syncStatus === "error" ? "⚠" : "☁"}
           </div>
         )}
-        <button onClick={() => setShowSettings(true)} style={{ ...btn(false, C.textMid, { padding: "5px 10px", fontSize: 14 }) }}>⚙</button>
+        <button data-tour="settings" onClick={() => setShowSettings(true)} style={{ ...btn(false, C.textMid, { padding: "5px 10px", fontSize: 14 }) }}>⚙</button>
       </div>
 
       <Nav view={view} setView={setView} reviewPending={reviewPending} />
@@ -5405,7 +5515,9 @@ function App() {
         syncEmail={syncEmail} syncStatus={syncStatus} lastSyncedAt={lastSyncedAt} manualPull={manualPull}
         onShowGuide={() => { setShowSettings(false); setShowGuide(true); }} />}
 
-      {(!guideSeen || showGuide) && <GuideModal onClose={() => { setGuideSeen(true); setShowGuide(false); }} />}
+      {(!guideSeen || showGuide) && !showSettings && (
+        <TourOverlay setView={setView} onClose={() => { setGuideSeen(true); setShowGuide(false); setView("day"); }} />
+      )}
     </div>
   );
 }
