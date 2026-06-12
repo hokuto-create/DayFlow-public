@@ -4869,6 +4869,7 @@ const TOUR_STEPS = [
   {
     view: "day", target: "nav", icon: "🧭", title: "画面はタブで切り替え",
     body: [
+      "タブは横にスクロールできます。",
       "よく使うのは「今日」「科目」「ゴール」の3つです。",
     ],
   },
@@ -4960,14 +4961,32 @@ function TourOverlay({ setView, onClose }) {
   useEffect(() => {
     setView(s.view);
     setRect(null);
-    if (!s.target) return;
     let cancelled = false;
+    const timers = [];
+
+    // 今いる画面のタブが画面外に隠れないよう、ナビを横スクロールして見せる
+    timers.push(setTimeout(() => {
+      if (cancelled) return;
+      const navBtn = document.querySelector(`[data-tour="nav-${s.view}"]`);
+      if (navBtn) try { navBtn.scrollIntoView({ block: "nearest", inline: "center" }); } catch {}
+    }, 60));
+
+    // タブ紹介のステップでは、ナビを端まで往復スクロールして全タブを見せる
+    if (s.target === "nav") {
+      const navEl = document.querySelector('[data-tour="nav"]');
+      if (navEl) {
+        timers.push(setTimeout(() => { if (!cancelled) navEl.scrollTo({ left: navEl.scrollWidth, behavior: "smooth" }); }, 700));
+        timers.push(setTimeout(() => { if (!cancelled) navEl.scrollTo({ left: 0, behavior: "smooth" }); }, 2000));
+      }
+    }
+
+    if (!s.target) return () => { cancelled = true; timers.forEach(clearTimeout); };
     let tries = 0;
     const measure = () => {
       if (cancelled) return;
       const el = document.querySelector(`[data-tour="${s.target}"]`);
       if (el) {
-        try { el.scrollIntoView({ block: "center" }); } catch {}
+        try { el.scrollIntoView({ block: "center", inline: "center" }); } catch {}
         requestAnimationFrame(() => {
           if (cancelled) return;
           const r = el.getBoundingClientRect();
@@ -4977,10 +4996,10 @@ function TourOverlay({ setView, onClose }) {
         setTimeout(measure, 50);
       }
     };
-    setTimeout(measure, 80);
+    timers.push(setTimeout(measure, 80));
     const onResize = () => { tries = 0; measure(); };
     window.addEventListener("resize", onResize);
-    return () => { cancelled = true; window.removeEventListener("resize", onResize); };
+    return () => { cancelled = true; timers.forEach(clearTimeout); window.removeEventListener("resize", onResize); };
   }, [step]);
 
   const PAD = 6;
