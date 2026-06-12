@@ -4862,58 +4862,62 @@ const TOUR_STEPS = [
   {
     view: "day", target: null, icon: "👋", title: "DayFlowへようこそ",
     body: [
-      "DayFlowは、学習計画・復習・振り返りを1つにまとめた学習プランナーです。",
-      "実際の画面を動かしながら、使い方を順番に案内します（1分くらいで終わります）。",
+      "勉強の計画・復習・振り返りをこれ1つで。",
+      "1分で使い方を案内します。",
     ],
   },
   {
-    view: "day", target: "nav", icon: "🧭", title: "画面はこのタブで切り替え",
+    view: "day", target: "nav", icon: "🧭", title: "画面はタブで切り替え",
     body: [
-      "「今日」で毎日のタスク、「科目」で教材の管理、「ゴール」で目標の設定をします。",
-      "「振り返り」「週次」「月次」は、記録と計画の確認に使います。",
+      "よく使うのは「今日」「科目」「ゴール」の3つです。",
     ],
   },
   {
-    view: "goals", target: "goal-add", icon: "🎯", title: "① まずゴールを決める",
+    view: "goals", target: "goal-add", icon: "🎯", title: "① ゴールを決める",
     body: [
-      "ここから、目指す目標（志望校・資格・試験など）と期限を登録します。",
-      "ゴールはあとで教材と紐づけられて、達成予測に使われます。",
+      "まず、目指す目標と期限をここから登録します。",
     ],
   },
   {
-    view: "subjects", target: "subject-add", icon: "📚", title: "② 教材と「やること」を登録",
+    view: "subjects", target: "subject-add", icon: "📚", title: "② 教材を登録",
     body: [
-      "ここから教材（参考書・問題集）を追加し、章や問題などの「やること」を入れていきます。",
-      "教材を選ぶと出てくる「⚡ 自動分配」ボタンで、やることが試験日までの毎日に自動で割り振られます。自分で組みたい場合は設定 ⚙ で「手動」に切り替えられます。",
+      "次に、使う参考書・問題集をここから追加します。",
     ],
   },
   {
-    view: "day", target: "task-add", icon: "🌅", title: "③ あとは毎日こなすだけ",
+    view: "subjects", target: null, icon: "⚡", title: "③ 予定はおまかせ",
     body: [
-      "自動分配した予定はこの「今日」画面に毎日表示されます。単発のタスクはこのボタンから直接追加もできます。",
-      "終わったタスクはタップしてチェックします。",
+      "教材に「やること」を入れて、「⚡ 自動分配」を押すだけ。",
+      "試験日までの毎日の予定が自動で組まれます。",
     ],
   },
   {
-    view: "day", target: null, icon: "🔁", title: "解けなかった問題は自動で復習",
+    view: "day", target: "task-add", icon: "🌅", title: "④ あとは毎日こなすだけ",
     body: [
-      "問題を終えるときに「解けた／解けなかった」を選ぶと、理解度マークが1段ずつ進みます。",
-      "◎になるまで、ちょうど忘れかけた頃に復習タスクが自動で入ります（間隔反復）。",
+      "組まれた予定は「今日」画面に並びます。",
+      "単発のタスクはこのボタンから追加できます。",
+    ],
+  },
+  {
+    view: "day", target: null, icon: "🔁", title: "復習は自動で入る",
+    body: [
+      "問題を終えたら「解けた／解けなかった」を選ぶだけ。",
+      "忘れかけた頃に、復習タスクが自動で入ります。",
     ],
     visual: "ladder",
   },
   {
-    view: "review", target: "nav-review", icon: "🌙", title: "④ 夜は1日を振り返る",
+    view: "review", target: "nav-review", icon: "🌙", title: "⑤ 夜は1日を振り返る",
     body: [
-      "1日の終わりに、この「振り返り」画面でその日の達成度を記録します。",
-      "夜8時を過ぎても未記録だと、タブに赤い印が出てお知らせします。",
+      "寝る前に、その日の達成度をここで記録します。",
+      "夜8時を過ぎると、赤い印でお知らせします。",
     ],
   },
   {
     view: "day", target: "settings", icon: "☁️", title: "データはクラウドに保存できる",
     body: [
-      "この設定 ⚙ からメールアドレスでログインすると、データが同期されて複数の端末で使えます（ログインしなくてもこの端末だけで使えます）。",
-      "このツアーは、設定の「📖 使い方ガイドを見る」からいつでも見直せます。",
+      "設定からログインすると、他の端末でも使えます。",
+      "このガイドも、設定からいつでも見直せます。",
     ],
   },
 ];
@@ -5013,7 +5017,7 @@ function TourOverlay({ setView, onClose }) {
           <span style={{ fontFamily: serif, fontSize: 16, color: C.accent }}>{s.title}</span>
         </div>
         {s.body.map((line, i) => (
-          <div key={i} style={{ fontSize: 12, color: C.text, lineHeight: 1.7, marginBottom: 6 }}>{line}</div>
+          <div key={i} style={{ fontSize: 13.5, color: C.text, lineHeight: 1.8, marginBottom: 7 }}>{line}</div>
         ))}
         {s.visual === "ladder" && <TourLadder />}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
