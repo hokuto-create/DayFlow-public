@@ -1995,7 +1995,183 @@ function templateEntries(data, vocabMode) {
 const vocabTotalWords = (data) =>
   (data.chapters || []).reduce((s, ch) => s + (ch.range ? ch.range.to - ch.range.from + 1 : 0), 0);
 
-function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, monthlyPlans, setMonthlyPlans, weeklyPlans, setWeeklyPlans, tasks, setTasks, selectedDate, goals, subjectCategories, setSubjectCategories, settings }) {
+/* ── AI目次取り込み（プレミアム機能） ──
+   目次ページの写真を縮小・JPEG圧縮して Edge Function `ai-toc-import` に送り、
+   章→問題リストの構造化JSONを受け取る。プレビューで編集・削除してから確定すると
+   テンプレート取り込みと同じ展開処理（importTemplate）で教材＋問題として登録される。
+   Anthropic APIキーはサーバー側 secrets のみで保持し、クライアントには露出しない。 */
+function AiTocImportModal({ onClose, onImport, onNeedUpgrade }) {
+  const [step, setStep] = useState("pick"); // pick | loading | preview
+  const [imgPreview, setImgPreview] = useState(null); // 縮小後の確認用サムネイル
+  const [imgBase64, setImgBase64] = useState(null);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState(null); // { bookTitle, chapters: [{ title, items: [{text}] }] }
+
+  const onFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setError("");
+    try {
+      const b64 = await compressImageToBase64(file);
+      setImgBase64(b64);
+      setImgPreview("data:image/jpeg;base64," + b64);
+    } catch {
+      setError("画像を読み込めませんでした。別の写真でお試しください。");
+    }
+  };
+
+  const analyze = async () => {
+    if (!imgBase64) return;
+    setStep("loading");
+    setError("");
+    try {
+      const res = await callEdgeFunction("ai-toc-import", { image: imgBase64, mediaType: "image/jpeg" });
+      const toc = res && res.result;
+      const chapters = ((toc && toc.chapters) || [])
+        .map(ch => ({
+          title: (ch.title || "").trim(),
+          items: (ch.items || []).filter(it => it && it.text && it.text.trim()).map(it => ({ text: it.text.trim() })),
+        }))
+        .filter(ch => ch.items.length > 0);
+      if (!chapters.length) {
+        setStep("pick");
+        setError("目次を読み取れませんでした。明るい場所で、目次ページ全体が写るように撮り直してください。");
+        return;
+      }
+      setResult({ bookTitle: ((toc && toc.bookTitle) || "").trim(), chapters });
+      setStep("preview");
+    } catch (e) {
+      setStep("pick");
+      if (e.code === "premium_required") { onNeedUpgrade(); return; }
+      setError(e.message || "解析に失敗しました。時間をおいて再度お試しください。");
+    }
+  };
+
+  const setBookTitle = (bookTitle) => setResult(r => ({ ...r, bookTitle }));
+  const setChapterTitle = (ci, title) =>
+    setResult(r => ({ ...r, chapters: r.chapters.map((c, i) => i === ci ? { ...c, title } : c) }));
+  const setItemText = (ci, ii, text) =>
+    setResult(r => ({ ...r, chapters: r.chapters.map((c, i) => i === ci
+      ? { ...c, items: c.items.map((it, j) => j === ii ? { text } : it) } : c) }));
+  const removeItem = (ci, ii) =>
+    setResult(r => ({ ...r, chapters: r.chapters.map((c, i) => i === ci
+      ? { ...c, items: c.items.filter((_, j) => j !== ii) } : c) }));
+  const removeChapter = (ci) =>
+    setResult(r => ({ ...r, chapters: r.chapters.filter((_, i) => i !== ci) }));
+  const totalItems = result ? result.chapters.reduce((s, c) => s + c.items.length, 0) : 0;
+
+  const fileBtnStyle = { ...btn(false, C.accent, { flex: 1, padding: "10px", fontSize: 12, color: C.accent, borderColor: C.accent, textAlign: "center", display: "block" }) };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "#0008", zIndex: 110,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+    }} onClick={step === "loading" ? undefined : onClose}>
+      <div style={{ ...card({ maxWidth: 440, width: "100%", maxHeight: "88vh", overflowY: "auto" }) }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+          <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.accent }}>📷 AI目次取り込み</div>
+          {step !== "loading" && (
+            <button onClick={onClose} style={{ ...btn(false, C.textMid, { padding: "4px 10px", fontSize: 12 }) }}>✕</button>
+          )}
+        </div>
+
+        {step === "pick" && (
+          <>
+            <div style={{ fontSize: 11, color: C.textMid, lineHeight: 1.7, marginBottom: 12 }}>
+              参考書の<b>目次ページ</b>を撮影すると、章と問題のリストを自動で読み取って教材として登録できます。
+              取り込み前に内容の確認・編集ができます。
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <label style={fileBtnStyle}>
+                📷 カメラで撮影
+                <input type="file" accept="image/*" capture="environment" onChange={onFile} style={{ display: "none" }} />
+              </label>
+              <label style={fileBtnStyle}>
+                🖼 写真を選ぶ
+                <input type="file" accept="image/*" onChange={onFile} style={{ display: "none" }} />
+              </label>
+            </div>
+            {imgPreview && (
+              <div style={{ marginBottom: 10, textAlign: "center" }}>
+                <img src={imgPreview} alt="目次プレビュー" style={{ maxWidth: "100%", maxHeight: 220, borderRadius: 8, border: `1px solid ${C.border}` }} />
+              </div>
+            )}
+            {error && <div style={{ fontSize: 11, color: C.red, marginBottom: 10, lineHeight: 1.6 }}>{error}</div>}
+            <button onClick={analyze} disabled={!imgBase64}
+              style={{ ...btn(true, C.accent, { width: "100%", padding: "10px", opacity: imgBase64 ? 1 : 0.4 }) }}>
+              ✨ この写真を解析する
+            </button>
+            <div style={{ fontSize: 10, color: C.textDim, marginTop: 8, lineHeight: 1.6 }}>
+              コツ: 真上から、ページ全体が入るように。文字が読める明るさで撮影してください。
+              目次が複数ページある場合は1ページずつ取り込めます。
+            </div>
+          </>
+        )}
+
+        {step === "loading" && (
+          <div style={{ textAlign: "center", padding: "28px 0" }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6 }}>AIが目次を読み取っています…</div>
+            <div style={{ fontSize: 11, color: C.textDim }}>10〜30秒ほどかかります。画面を閉じずにお待ちください。</div>
+          </div>
+        )}
+
+        {step === "preview" && result && (
+          <>
+            <div style={{ fontSize: 11, color: C.textMid, marginBottom: 4 }}>教材名（書名）</div>
+            <input style={input({ marginBottom: 10, fontWeight: 700 })} placeholder="教材名"
+              value={result.bookTitle} onChange={e => setBookTitle(e.target.value)} />
+            <div style={{ fontSize: 11, color: C.textMid, marginBottom: 8 }}>
+              読み取り結果: <b style={{ color: C.accent }}>{result.chapters.length}章・{totalItems}問</b>
+              <span style={{ color: C.textDim }}>（タップで編集、✕で削除できます）</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+              {result.chapters.map((ch, ci) => (
+                <div key={ci} style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: 10, background: C.surfaceUp }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 6 }}>
+                    <input style={input({ fontWeight: 700, fontSize: 12 })} value={ch.title} placeholder="章タイトル"
+                      onChange={e => setChapterTitle(ci, e.target.value)} />
+                    <button onClick={() => removeChapter(ci)}
+                      style={{ ...btn(false, C.red, { padding: "5px 9px", fontSize: 11, flexShrink: 0 }) }}>✕</button>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {ch.items.map((it, ii) => (
+                      <div key={ii} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <input style={input({ fontSize: 12, padding: "5px 10px" })} value={it.text}
+                          onChange={e => setItemText(ci, ii, e.target.value)} />
+                        <button onClick={() => removeItem(ci, ii)}
+                          style={{ background: "transparent", border: "none", color: C.textDim, cursor: "pointer", fontSize: 12, padding: 4, flexShrink: 0 }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{
+              padding: "8px 12px", borderRadius: 8, marginBottom: 10,
+              background: C.yellowDim, border: `1px solid ${C.yellow}40`,
+              fontSize: 10, color: C.textMid, lineHeight: 1.6,
+            }}>
+              ⚠ AIの読み取りには誤りが含まれることがあります。実際の書籍と見比べて確認してください。取り込み後も編集・削除できます。
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button onClick={() => onImport(result)} disabled={totalItems === 0}
+                style={{ ...btn(true, C.accent, { flex: 1, padding: "10px", fontSize: 13, opacity: totalItems === 0 ? 0.4 : 1 }) }}>
+                この内容で取り込む（{totalItems}問）
+              </button>
+              <button onClick={() => { setStep("pick"); setResult(null); }}
+                style={{ ...btn(false, C.textMid, { padding: "10px 12px", fontSize: 12 }) }}>撮り直す</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, monthlyPlans, setMonthlyPlans, weeklyPlans, setWeeklyPlans, tasks, setTasks, selectedDate, goals, subjectCategories, setSubjectCategories, settings, plan, openPlanModal }) {
   const autoMode = (settings?.scheduleMode ?? "auto") === "auto";
   const chunkBoundary = settings?.chunkBoundary ?? true;
   // 科目 (stored as `category`): persisted list, plus any from existing subjects
@@ -2045,6 +2221,8 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
   const [tplLoadingId, setTplLoadingId] = useState(null);
   const [tplPreview, setTplPreview] = useState(null); // 取り込み前の確認画面に表示する教材データ
   const [tplVocabMode, setTplVocabMode] = useState("sections"); // vocab型の区切り: "sections" | 25 | 50 | 100
+  // AI目次取り込み（プレミアム機能）のモーダル開閉
+  const [aiImportOpen, setAiImportOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -2131,6 +2309,27 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
     setActiveSubject(id);
     setShowSubjectForm(false);
     closeTplPicker();
+  };
+
+  // AI目次取り込みの確定: 結果をテンプレートと同じ形に変換し、
+  // importTemplate（テンプレ取り込みと同一の展開処理）を再利用して登録する。
+  const importAiResult = (toc) => {
+    importTemplate({
+      id: "ai-" + genId(), // 既存テンプレの取り込み済み判定と衝突しないユニークID
+      name: (toc.bookTitle || "").trim() || "AI取り込み教材",
+      subject: activeCategory,
+      color: C.accent,
+      chapters: toc.chapters,
+    });
+    setAiImportOpen(false);
+  };
+
+  // AI目次取り込みの入口。未課金ならプラン比較モーダルへ（アップセル導線）
+  const openAiImport = () => {
+    closeTplPicker();
+    setShowSubjectForm(false);
+    if (canUseAI(plan)) setAiImportOpen(true);
+    else openPlanModal();
   };
 
   const addTodo = () => {
@@ -2730,6 +2929,13 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
               </div>
             </>
           )}
+          <button onClick={openAiImport}
+            style={{ ...btn(false, C.accent, { width: "100%", padding: "9px", marginTop: 8, color: C.accent, borderColor: C.accent }) }}>
+            📷 目次を撮って取り込む{canUseAI(plan) ? "" : "（プレミアム）"}
+          </button>
+          <div style={{ fontSize: 10, color: C.textDim, marginTop: 6, textAlign: "center" }}>
+            目次ページの写真から問題リストを自動生成します
+          </div>
         </div>
       )}
 
@@ -2770,8 +2976,18 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {filtered.length === 0 && (
-                      <div style={{ fontSize: 12, color: C.textDim, textAlign: "center", padding: "16px 0" }}>
-                        該当するテンプレートがありません
+                      <div style={{ textAlign: "center", padding: "16px 0" }}>
+                        <div style={{ fontSize: 12, color: C.textDim, marginBottom: 10 }}>
+                          該当するテンプレートがありません
+                        </div>
+                        {/* テンプレが無い教材はAI目次取り込みへ誘導（アップセル導線） */}
+                        <button onClick={openAiImport}
+                          style={{ ...btn(false, C.accent, { fontSize: 12, padding: "8px 14px", color: C.accent, borderColor: C.accent }) }}>
+                          📷 目次を撮って取り込む{canUseAI(plan) ? "" : "（プレミアム）"}
+                        </button>
+                        <div style={{ fontSize: 10, color: C.textDim, marginTop: 6 }}>
+                          お手持ちの参考書の目次写真から問題リストを自動生成できます
+                        </div>
                       </div>
                     )}
                     {filtered.map(t => {
@@ -2868,6 +3084,15 @@ function SubjectsView({ subjects, setSubjects, subjectTodos, setSubjectTodos, mo
           </div>
         );
       })()}
+
+      {/* AI目次取り込みモーダル（プレミアム） */}
+      {aiImportOpen && (
+        <AiTocImportModal
+          onClose={() => setAiImportOpen(false)}
+          onImport={importAiResult}
+          onNeedUpgrade={() => { setAiImportOpen(false); openPlanModal(); }}
+        />
+      )}
 
       {/* Subject content */}
       {activeSubjectData ? (
@@ -5362,7 +5587,116 @@ function TourOverlay({ setView, onClose }) {
   );
 }
 
-function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syncStatus, lastSyncedAt, manualPull, onShowGuide }) {
+/* ── プラン比較モーダル ──
+   無料/スタンダード/プレミアムの3列比較。年額を推奨表示（月換算つき）。
+   決済は Edge Function `create-checkout-session` 経由の Stripe Checkout。
+   既に課金中のプラン変更は Customer Portal（onManage）へ誘導する。 */
+function PlanModal({ plan, loggedIn, busy, onClose, onCheckout, onLogin, onManage }) {
+  const [cycle, setCycle] = useState("yearly"); // monthly | yearly（年額を推奨表示）
+  const PLANS = [
+    {
+      key: "free", name: "無料", monthly: 0, yearly: 0,
+      features: ["全機能をこの端末で利用", "間隔反復・自動分配", "定番教材テンプレート"],
+    },
+    {
+      key: "standard", name: "スタンダード", monthly: 600, yearly: 6000,
+      features: ["無料の全機能", "クラウド同期（複数端末）", "学習統計・バックアップ"],
+    },
+    {
+      key: "premium", name: "プレミアム", monthly: 1000, yearly: 10000,
+      features: ["スタンダードの全機能", "📷 AI目次取り込み"], badge: "おすすめ",
+    },
+  ];
+  const priceLine = (p) => {
+    if (p.key === "free") return { main: "¥0", sub: "ずっと無料" };
+    return cycle === "yearly"
+      ? { main: `¥${p.yearly.toLocaleString()}/年`, sub: `月あたり¥${Math.round(p.yearly / 12).toLocaleString()}` }
+      : { main: `¥${p.monthly.toLocaleString()}/月`, sub: "いつでも解約OK" };
+  };
+  const actionFor = (p) => {
+    if (p.key === plan) return { label: "利用中", current: true };
+    if (p.key === "free") return null; // 無料への変更は「プランを管理」（解約）から
+    if (!loggedIn) return { label: "ログインして始める", onClick: onLogin };
+    if (plan !== "free") return { label: "プラン変更はこちら", onClick: onManage }; // 二重契約防止
+    return { label: busy ? "処理中…" : "このプランにする", onClick: () => onCheckout(p.key, cycle), disabled: busy };
+  };
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "#0008", zIndex: 120,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 12,
+    }} onClick={onClose}>
+      <div style={{ ...card({ maxWidth: 480, width: "100%", padding: 18, maxHeight: "90vh", overflowY: "auto" }) }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
+          <div style={{ flex: 1, fontFamily: serif, fontSize: 17, color: C.accent }}>プラン</div>
+          <button onClick={onClose} style={{ ...btn(false, C.textMid, { padding: "4px 10px", fontSize: 12 }) }}>✕</button>
+        </div>
+        <div style={{ fontSize: 11, color: C.textMid, marginBottom: 12 }}>
+          いまの機能はずっと無料で使えます。必要になったら、必要な分だけ。
+        </div>
+
+        {/* 月払い / 年払い 切り替え */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+          <button onClick={() => setCycle("yearly")}
+            style={{ ...btn(cycle === "yearly", C.accent, { flex: 1.4, fontSize: 11, padding: "7px" }) }}>
+            年払い（2ヶ月分おトク）
+          </button>
+          <button onClick={() => setCycle("monthly")}
+            style={{ ...btn(cycle === "monthly", C.accent, { flex: 1, fontSize: 11, padding: "7px" }) }}>
+            月払い
+          </button>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 12 }}>
+          {PLANS.map(p => {
+            const price = priceLine(p);
+            const action = actionFor(p);
+            const hot = !!p.badge;
+            return (
+              <div key={p.key} style={{
+                border: `1.5px solid ${hot ? C.accent : C.border}`,
+                borderRadius: 10, padding: "10px 8px", position: "relative",
+                background: hot ? C.accentDim : C.surface,
+                display: "flex", flexDirection: "column",
+              }}>
+                {hot && (
+                  <div style={{
+                    position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)",
+                    background: C.accent, color: "#fff", fontSize: 9, fontWeight: 700,
+                    padding: "1px 8px", borderRadius: 8, whiteSpace: "nowrap",
+                  }}>{p.badge}</div>
+                )}
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.text, textAlign: "center", marginBottom: 4 }}>{p.name}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: hot ? C.accent : C.text, textAlign: "center", fontFamily: serif }}>{price.main}</div>
+                <div style={{ fontSize: 9, color: C.textDim, textAlign: "center", marginBottom: 8 }}>{price.sub}</div>
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
+                  {p.features.map((f, i) => (
+                    <div key={i} style={{ fontSize: 9.5, color: C.textMid, lineHeight: 1.4 }}>✓ {f}</div>
+                  ))}
+                </div>
+                {action && (action.current ? (
+                  <div style={{ fontSize: 10, color: C.green, fontWeight: 700, textAlign: "center", padding: "6px 0" }}>✓ 利用中</div>
+                ) : (
+                  <button onClick={action.onClick} disabled={action.disabled}
+                    style={{ ...btn(hot, C.accent, { width: "100%", fontSize: 10, padding: "7px 4px", opacity: action.disabled ? 0.6 : 1 }) }}>
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ fontSize: 10, color: C.textDim, lineHeight: 1.7 }}>
+          ・解約・お支払い方法の変更は、いつでも設定の「プランを管理」からできます。<br />
+          ・解約してもこの端末のデータはそのまま残り、無料プランの機能は引き続き使えます。
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syncStatus, lastSyncedAt, manualPull, onShowGuide, plan, planLoaded, onShowPlans, onManagePlan }) {
   const [local, setLocal] = useState({ dayStartHour: 5, dayEndHour: 26, examDate: "", examLabel: "", scheduleMode: "auto", chunkBoundary: true, ...settings });
   const [confirmReset, setConfirmReset] = useState(false);
   // メールOTPログイン用のローカル状態
@@ -5399,6 +5733,7 @@ function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syn
     syncing: { text: "同期中…", color: C.blue },
     synced: { text: "✓ 同期済み", color: C.green },
     error: { text: "⚠ エラー", color: C.red },
+    gated: { text: "🔒 同期は停止中", color: C.textMid },
   };
   const status = statusMap[syncStatus] || statusMap.idle;
   return (
@@ -5415,6 +5750,32 @@ function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syn
           {syncEmail ? (
             <>
               <div style={{ fontSize: 11, color: C.text, marginBottom: 6 }}>ログイン中: <b>{syncEmail}</b></div>
+              {/* 現在のプランと管理導線 */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: C.textMid }}>プラン:</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: plan === "free" ? C.textMid : C.accent }}>
+                  {planLoaded ? PLAN_LABEL[plan] : "確認中…"}
+                </span>
+                <div style={{ flex: 1 }} />
+                {planLoaded && (plan === "free" ? (
+                  <button onClick={onShowPlans}
+                    style={{ ...btn(true, C.accent, { fontSize: 10, padding: "4px 10px" }) }}>プランを見る</button>
+                ) : (
+                  <button onClick={onManagePlan}
+                    style={{ ...btn(false, C.accent, { fontSize: 10, padding: "4px 8px", color: C.accent, borderColor: C.accent }) }}>プランを管理</button>
+                ))}
+              </div>
+              {/* 未課金ユーザーへのアップセル（認証は通すが同期はしない） */}
+              {planLoaded && plan === "free" && (
+                <div style={{
+                  fontSize: 10, color: C.textMid, background: C.accentDim,
+                  border: `1px solid ${C.accentSoft}`, borderRadius: 6,
+                  padding: "8px 10px", marginBottom: 6, lineHeight: 1.7,
+                }}>
+                  ☁ クラウド同期はスタンダードプランの機能です（年額¥6,000・月あたり¥500）。<br />
+                  データはこれまでどおり、この端末に保存されています。
+                </div>
+              )}
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 11, color: status.color, fontWeight: 600 }}>{status.text}</span>
                 {lastSyncedAt > 0 && (
@@ -5433,6 +5794,7 @@ function SettingsModal({ settings, setSettings, onClose, onReset, syncEmail, syn
             <>
               <div style={{ fontSize: 10, color: C.textDim, marginBottom: 6 }}>
                 メールアドレスに届く6桁のコードでログインすると、同じアカウントの端末間でデータが同期されます。
+                ログインは無料です（同期の利用にはスタンダードプランが必要です）。
               </div>
               <input style={{ ...input({ marginBottom: 6 }), WebkitAppearance: "none", appearance: "none" }}
                 type="email" placeholder="your@email.com" disabled={authStep === "sent"}
@@ -5602,6 +5964,95 @@ async function cloudPush(userId, email, data) {
   } catch (e) { console.error("push failed", e); return false; }
 }
 
+// ────────── 課金（サブスクリプション）──────────
+// プランの真実はサーバー側（subscriptions テーブル＝Stripe webhook が更新、
+// Edge Function が再検証）。クライアントのゲートはUX目的のショートカット。
+const PLAN_RANK = { free: 0, standard: 1, premium: 2 };
+const PLAN_LABEL = { free: "無料", standard: "スタンダード", premium: "プレミアム" };
+const canSync = (plan) => (PLAN_RANK[plan] || 0) >= PLAN_RANK.standard;
+const canUseAI = (plan) => (PLAN_RANK[plan] || 0) >= PLAN_RANK.premium;
+
+// subscriptions 行から現在有効なプランを判定する（Edge Function 側と同じ規則）
+function resolvePlan(row) {
+  if (!row) return "free";
+  if (row.status !== "active" && row.status !== "trialing") return "free";
+  if (row.current_period_end) {
+    const end = new Date(row.current_period_end).getTime();
+    // webhook の反映遅延で課金済みユーザーが弾かれないよう1日の猶予を持たせる
+    if (Number.isFinite(end) && end + 24 * 60 * 60 * 1000 < Date.now()) return "free";
+  }
+  return row.plan === "premium" ? "premium" : "standard";
+}
+
+// 自分の subscription 行を読む（RLSで本人のみSELECT可。行が無ければ null＝無料）
+async function fetchSubscription(userId) {
+  if (!userId) return null;
+  try {
+    const { data, error } = await sbClient
+      .from("subscriptions")
+      .select("plan,status,current_period_end")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) { console.error("subscription fetch failed", error); return null; }
+    return data || null;
+  } catch (e) { console.error("subscription fetch failed", e); return null; }
+}
+
+// Supabase Edge Function をログインユーザーの JWT 付きで呼ぶ
+async function callEdgeFunction(name, body) {
+  const { data } = await sbClient.auth.getSession();
+  const session = data && data.session;
+  if (!session) { const err = new Error("ログインが必要です"); err.code = "unauthenticated"; throw err; }
+  const res = await fetch(`${SUPA_URL}/functions/v1/${name}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+      apikey: SUPA_KEY,
+    },
+    body: JSON.stringify(body || {}),
+  });
+  let json = {};
+  try { json = await res.json(); } catch {}
+  if (!res.ok) {
+    const err = new Error(json.error || `エラーが発生しました (HTTP ${res.status})`);
+    err.status = res.status;
+    err.code = json.code;
+    throw err;
+  }
+  return json;
+}
+
+// Checkout / Customer Portal から戻ってくる先（クエリは付けない）
+const appReturnUrl = () => location.origin + location.pathname;
+
+// 画像を長辺 maxEdge px に縮小して JPEG 圧縮し、base64（dataURLヘッダ無し）を返す。
+// AI目次取り込みの送信前処理。元画像はアップロードしない。
+function compressImageToBase64(file, maxEdge = 1568, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        try {
+          const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", quality).split(",")[1]);
+        } catch (e) { reject(e); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function usePersistedState(key, initial) {
   const [state, setState] = useState(() => {
     try {
@@ -5656,9 +6107,16 @@ function App() {
   const [reviews, setReviews] = usePersistedState("reviews", {}); // 日付ごとの振り返り記録（完了フラグ含む）
   const [settings, setSettings] = usePersistedState("settings", { dayStartHour: 5, dayEndHour: 26, examDate: "", examLabel: "", scheduleMode: "auto", chunkBoundary: true });
   const [session, setSession] = useState(null);
-  const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
+  const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error | gated
   const [lastSyncedAt, setLastSyncedAt] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  // 課金状態: 自分の subscriptions 行（無ければ null＝無料）と取得完了フラグ
+  const [subRow, setSubRow] = useState(null);
+  const [planLoaded, setPlanLoaded] = useState(false);
+  const [showPlans, setShowPlans] = useState(false); // プラン比較モーダル
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  // Stripe Checkout 完了から戻ってきた直後か（webhook 反映待ちポーリング用）
+  const checkoutPendingRef = useRef(new URLSearchParams(location.search).get("checkout") === "success");
   // 初回起動時の使い方ガイド。一度閉じたら端末（localStorage）に記録して以後は出さない。
   const [guideSeen, setGuideSeen] = usePersistedState("guideSeen", false);
   const [showGuide, setShowGuide] = useState(false);
@@ -5674,7 +6132,49 @@ function App() {
   const syncUserId = session && session.user ? session.user.id : "";
   const syncEmail = session && session.user ? (session.user.email || "") : "";
 
+  // 現在の有効プラン（ログイン前・取得前は free 扱い）
+  const plan = syncUserId && planLoaded ? resolvePlan(subRow) : "free";
+
+  // ログイン後にまず課金状態を取得する（同期可否の判定が先）
+  useEffect(() => {
+    if (!syncUserId) { setSubRow(null); setPlanLoaded(false); return; }
+    let alive = true;
+    fetchSubscription(syncUserId).then(row => {
+      if (alive) { setSubRow(row); setPlanLoaded(true); }
+    });
+    return () => { alive = false; };
+  }, [syncUserId]);
+
+  // Checkout から戻った直後: URLの ?checkout=... を消し、webhook 反映待ちのため
+  // subscriptions を数回ポーリングして再取得する
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.has("checkout")) {
+      params.delete("checkout");
+      const qs = params.toString();
+      history.replaceState(null, "", location.pathname + (qs ? `?${qs}` : "") + location.hash);
+    }
+  }, []);
+  useEffect(() => {
+    if (!syncUserId || !checkoutPendingRef.current) return;
+    let alive = true;
+    let tries = 0;
+    const tick = async () => {
+      if (!alive) return;
+      const row = await fetchSubscription(syncUserId);
+      if (!alive) return;
+      setSubRow(row);
+      setPlanLoaded(true);
+      if (row && resolvePlan(row) !== "free") { checkoutPendingRef.current = false; return; }
+      if (++tries < 10) setTimeout(tick, 3000);
+      else checkoutPendingRef.current = false;
+    };
+    tick();
+    return () => { alive = false; };
+  }, [syncUserId]);
+
   // Pull from cloud once after sign-in
+  // （クラウド同期はスタンダード以上のみ。未課金は認証だけ通し、ローカルデータには触れない）
   useEffect(() => {
     if (!syncUserId) {
       initialPulledRef.current = false;
@@ -5682,6 +6182,8 @@ function App() {
       setSyncStatus("idle");
       return;
     }
+    if (!planLoaded) return;
+    if (!canSync(resolvePlan(subRow))) { setSyncStatus("gated"); return; }
     if (initialPulledRef.current) return;
     initialPulledRef.current = true;
     setSyncStatus("syncing");
@@ -5701,11 +6203,13 @@ function App() {
       }
       setSyncStatus("synced");
     });
-  }, [syncUserId]);
+  }, [syncUserId, planLoaded, subRow]);
 
   // Push to cloud (debounced 3s) when data changes
+  // （同期ゲート: スタンダード以上のみ。期限切れ・解約後はpushも止まる）
   useEffect(() => {
     if (!syncUserId || !initialPulledRef.current) return;
+    if (!planLoaded || !canSync(resolvePlan(subRow))) return;
     const payload = { tasks, goals, subjects, subjectTodos, monthlyPlans, weeklyPlans, reviews, settings, subjectCategories };
     const serialized = JSON.stringify(payload);
     if (serialized === lastPushedDataRef.current) return;
@@ -5722,11 +6226,12 @@ function App() {
       });
     }, 3000);
     return () => clearTimeout(timer);
-  }, [syncUserId, tasks, goals, subjects, subjectTodos, monthlyPlans, weeklyPlans, reviews, settings, subjectCategories]);
+  }, [syncUserId, planLoaded, subRow, tasks, goals, subjects, subjectTodos, monthlyPlans, weeklyPlans, reviews, settings, subjectCategories]);
 
   // Manual pull
   const manualPull = async () => {
     if (!syncUserId) return;
+    if (!canSync(plan)) { setShowSettings(false); setShowPlans(true); return; } // アップセル導線
     setSyncStatus("syncing");
     const row = await cloudPull(syncUserId);
     if (row && row.data) {
@@ -5745,6 +6250,38 @@ function App() {
       setSyncStatus("synced");
     } else {
       setSyncStatus("synced");
+    }
+  };
+
+  // Stripe Checkout を開く（Edge Function が JWT を検証してセッションURLを返す）
+  const startCheckout = async (planKey, interval) => {
+    if (!syncUserId) {
+      alert("先に設定画面からメールアドレスでログインしてください（無料）");
+      setShowPlans(false);
+      setShowSettings(true);
+      return;
+    }
+    setCheckoutBusy(true);
+    try {
+      checkoutPendingRef.current = true; // 戻ってきたときに反映待ちポーリングする
+      const { url } = await callEdgeFunction("create-checkout-session", {
+        plan: planKey, interval, returnUrl: appReturnUrl(),
+      });
+      location.href = url;
+    } catch (e) {
+      checkoutPendingRef.current = false;
+      setCheckoutBusy(false);
+      alert(e.message || "決済ページを開けませんでした。");
+    }
+  };
+
+  // Stripe Customer Portal（解約・支払い方法変更・プラン変更）を開く
+  const openPortal = async () => {
+    try {
+      const { url } = await callEdgeFunction("create-portal-session", { returnUrl: appReturnUrl() });
+      location.href = url;
+    } catch (e) {
+      alert(e.message || "管理ページを開けませんでした。");
     }
   };
 
@@ -5807,7 +6344,7 @@ function App() {
         {syncEmail && (
           <div onClick={() => setShowSettings(true)} title={syncStatus}
             style={{ fontSize: 14, cursor: "pointer", padding: "2px 6px" }}>
-            {syncStatus === "syncing" ? "⟳" : syncStatus === "synced" ? "✓" : syncStatus === "error" ? "⚠" : "☁"}
+            {syncStatus === "syncing" ? "⟳" : syncStatus === "synced" ? "✓" : syncStatus === "error" ? "⚠" : syncStatus === "gated" ? "🔒" : "☁"}
           </div>
         )}
         <button data-tour="settings" onClick={() => setShowSettings(true)} style={{ ...btn(false, C.textMid, { padding: "5px 10px", fontSize: 14 }) }}>⚙</button>
@@ -5819,7 +6356,7 @@ function App() {
       <div style={{ flex: 1, overflowY: "auto" }}>
         {view === "day"    && <DayView tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} goals={goals} subjects={subjects} subjectTodos={subjectTodos} setSubjectTodos={setSubjectTodos} settings={settings} />}
         {view === "review" && <ReviewView tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setView={setView} subjects={subjects} subjectTodos={subjectTodos} settings={settings} goals={goals} reviews={reviews} setReviews={setReviews} />}
-        {view === "subjects" && <SubjectsView subjects={subjects} setSubjects={setSubjects} subjectTodos={subjectTodos} setSubjectTodos={setSubjectTodos} monthlyPlans={monthlyPlans} setMonthlyPlans={setMonthlyPlans} weeklyPlans={weeklyPlans} setWeeklyPlans={setWeeklyPlans} tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} goals={goals} subjectCategories={subjectCategories} setSubjectCategories={setSubjectCategories} settings={settings} />}
+        {view === "subjects" && <SubjectsView subjects={subjects} setSubjects={setSubjects} subjectTodos={subjectTodos} setSubjectTodos={setSubjectTodos} monthlyPlans={monthlyPlans} setMonthlyPlans={setMonthlyPlans} weeklyPlans={weeklyPlans} setWeeklyPlans={setWeeklyPlans} tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} goals={goals} subjectCategories={subjectCategories} setSubjectCategories={setSubjectCategories} settings={settings} plan={plan} openPlanModal={() => setShowPlans(true)} />}
         {view === "week"   && <WeekView tasks={tasks} setTasks={setTasks} selectedDate={selectedDate} setSelectedDate={setSelectedDate} weeklyPlans={weeklyPlans} setWeeklyPlans={setWeeklyPlans} subjects={subjects} subjectTodos={subjectTodos} setView={setView} settings={settings} />}
         {view === "month"  && <MonthView goals={goals} monthlyPlans={monthlyPlans} setMonthlyPlans={setMonthlyPlans} weeklyPlans={weeklyPlans} setWeeklyPlans={setWeeklyPlans} subjects={subjects} subjectTodos={subjectTodos} setView={setView} selectedDate={selectedDate} tasks={tasks} settings={settings} />}
         {view === "goals"  && <GoalsView goals={goals} setGoals={setGoals} subjects={subjects} />}
@@ -5827,7 +6364,22 @@ function App() {
 
       {showSettings && <SettingsModal settings={settings} setSettings={setSettings} onClose={() => setShowSettings(false)} onReset={resetAll}
         syncEmail={syncEmail} syncStatus={syncStatus} lastSyncedAt={lastSyncedAt} manualPull={manualPull}
+        plan={plan} planLoaded={planLoaded}
+        onShowPlans={() => { setShowSettings(false); setShowPlans(true); }}
+        onManagePlan={openPortal}
         onShowGuide={() => { setShowSettings(false); setShowGuide(true); }} />}
+
+      {showPlans && (
+        <PlanModal
+          plan={plan}
+          loggedIn={!!syncUserId}
+          busy={checkoutBusy}
+          onClose={() => setShowPlans(false)}
+          onCheckout={startCheckout}
+          onLogin={() => { setShowPlans(false); setShowSettings(true); }}
+          onManage={() => { setShowPlans(false); openPortal(); }}
+        />
+      )}
 
       {(!guideSeen || showGuide) && !showSettings && (
         <TourOverlay setView={setView} onClose={() => { setGuideSeen(true); setShowGuide(false); setView("day"); }} />
