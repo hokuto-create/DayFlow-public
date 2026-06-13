@@ -1,0 +1,10 @@
+# Edge Functions の secrets（絶対にコミットしない）
+.env
+.env.*
+!.env.example
+
+# Supabase CLI
+.supabase/
+
+# OS / エディタ
+.DS_Store
